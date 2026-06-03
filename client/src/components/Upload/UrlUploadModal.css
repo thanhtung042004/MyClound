@@ -1,0 +1,123 @@
+.url-upload-modal {
+  max-width: 550px;
+}
+
+.url-input-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.url-input {
+  flex: 1;
+}
+
+.url-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: rgba(244, 63, 94, 0.1);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.url-info-card {
+  margin-top: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+.url-info-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.url-thumbnail {
+  width: 120px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+}
+
+.url-icon-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.url-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.url-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.url-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.url-format-selection {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.format-options {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.format-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.85rem;
+}
+
+.format-option:hover:not(:disabled) {
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+}
+
+.format-option.active {
+  background: rgba(108, 99, 255, 0.1);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  font-weight: 500;
+}
+
+.format-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

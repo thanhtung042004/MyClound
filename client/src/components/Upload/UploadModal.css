@@ -1,0 +1,108 @@
+.upload-modal {
+  max-width: 560px;
+}
+
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--bg-card);
+}
+
+.dropzone:hover,
+.dropzone.drag-active {
+  border-color: var(--accent-purple);
+  background: rgba(108, 99, 255, 0.08);
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropzone-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(108, 99, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-purple);
+  margin-bottom: 8px;
+}
+
+.dropzone-content p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.click-link {
+  color: var(--accent-purple);
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dropzone-hint {
+  font-size: 0.8rem !important;
+  color: var(--text-muted) !important;
+}
+
+.upload-file-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.upload-file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.upload-file-icon {
+  color: var(--accent-purple);
+  flex-shrink: 0;
+}
+
+.upload-file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.upload-file-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upload-file-size {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.upload-progress {
+  margin-top: 16px;
+}
+
+.progress-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 8px;
+}

@@ -1,0 +1,241 @@
+.file-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  overflow: visible;
+  cursor: default;
+  position: relative;
+  transition: var(--transition);
+}
+
+.file-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+/* Thumbnail */
+.file-card-thumb {
+  position: relative;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.file-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.file-card:hover .file-thumb-img {
+  transform: scale(1.05);
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  color: white;
+}
+
+.file-icon-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.03);
+}
+
+.file-ext {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--type-color, var(--text-muted));
+  letter-spacing: 0.05em;
+}
+
+.file-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.file-card:hover .file-card-overlay {
+  opacity: 1;
+}
+
+.overlay-btn {
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.overlay-btn:hover {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+}
+
+.file-star-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-shared-indicator {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(108, 99, 255, 0.8);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* Info */
+.file-card-info {
+  padding: 10px 12px 6px;
+}
+
+.file-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+}
+
+.file-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Actions */
+.file-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 2px 8px 8px;
+  opacity: 0;
+  transition: var(--transition);
+  overflow: visible;
+  position: relative;
+  z-index: 10;
+}
+
+.file-card:hover .file-card-actions {
+  opacity: 1;
+}
+
+.file-menu-wrapper {
+  position: relative;
+  margin-left: auto;
+}
+
+.file-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  z-index: 200;
+  min-width: 160px;
+}
+
+/* List View */
+.file-list-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.file-list-item:hover {
+  transform: none;
+  background: var(--bg-card-hover);
+}
+
+.file-list-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.file-list-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-list-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-list-info {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.file-shared-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  background: rgba(108,99,255,0.15);
+  color: var(--accent-purple);
+  border-radius: 99px;
+  border: 1px solid rgba(108,99,255,0.3);
+  white-space: nowrap;
+}
+
+.file-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.starred svg {
+  color: var(--warning);
+}
