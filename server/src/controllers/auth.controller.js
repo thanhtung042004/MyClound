@@ -117,4 +117,31 @@ const changePassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe, updateProfile, changePassword };
+// POST /api/auth/reset-password (public)
+const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp email và mật khẩu mới.' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'Mật khẩu phải có ít nhất 6 ký tự.' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản với email này.' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = { register, login, getMe, updateProfile, changePassword, resetPassword };

@@ -441,3 +441,140 @@
     display: none;
   }
 }
+
+/* ===== FORGOT PASSWORD ===== */
+
+/* Card wrapper — prevent overflow during slide */
+.forgot-card-wrap {
+  overflow: hidden;
+}
+
+/* Each view panel */
+.forgot-view {
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.forgot-view--active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+/* Outgoing: slide left */
+.forgot-view--hidden.forgot-view--out {
+  opacity: 0;
+  transform: translateX(-28px);
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Incoming: slide from right */
+.forgot-view--hidden.forgot-view--in {
+  opacity: 0;
+  transform: translateX(28px);
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Forgot password icon above heading */
+.forgot-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(91, 141, 238, 0.12);
+  border: 1px solid rgba(91, 141, 238, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+/* Replace <a href="#"> with button */
+.forgot-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.8rem;
+  color: #5b8dee;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: color 0.2s;
+}
+
+.forgot-link-btn:hover {
+  color: #7aaaff;
+}
+
+/* Password strength bar */
+.forgot-strength {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -4px;
+}
+
+.forgot-strength-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+
+.forgot-strength-bar::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  border-radius: 999px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+.forgot-strength-bar.weak::after {
+  width: 30%;
+  background: #f43f5e;
+}
+
+.forgot-strength-bar.medium::after {
+  width: 65%;
+  background: #f59e0b;
+}
+
+.forgot-strength-bar.strong::after {
+  width: 100%;
+  background: #10b981;
+}
+
+.forgot-strength-label {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+}
+
+/* Back to login button */
+.forgot-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.82rem;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.forgot-back-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+

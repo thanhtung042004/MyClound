@@ -6,6 +6,7 @@ export const authService = {
   getMe: () => api.get('/auth/me'),
   updateProfile: (data) => api.put('/auth/update-profile', data),
   changePassword: (data) => api.put('/auth/change-password', data),
+  resetPassword: (data) => api.post('/auth/reset-password', data),
 };
 
 export const fileService = {
