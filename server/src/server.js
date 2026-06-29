@@ -18,15 +18,27 @@ connectDB();
 // CORS
 const allowedOrigins = [
   'http://localhost:5173',
+  'http://localhost:3000',
   'https://my-cloud.vercel.app',
   'https://my-clound.vercel.app',
   'https://my-clound-git-main-thanhtung042004s-projects.vercel.app',
   process.env.CLIENT_URL,
-];
+].filter(Boolean).map(o => o.replace(/\/$/, '')); // Lọc undefined và bỏ dấu / cuối
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Cho phép request không có origin (mobile app, Postman, curl...)
+    if (!origin) return callback(null, true);
+
+    const cleanOrigin = origin.replace(/\/$/, '');
+
+    // Kiểm tra whitelist cố định
+    if (allowedOrigins.includes(cleanOrigin)) {
+      return callback(null, true);
+    }
+
+    // Cho phép tất cả subdomain của vercel.app (preview deployments)
+    if (/^https:\/\/[\w-]+-[\w-]+-thanhtung042004s-projects\.vercel\.app$/.test(cleanOrigin)) {
       return callback(null, true);
     }
 
@@ -34,7 +46,14 @@ app.use(cors({
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+
+// Xử lý preflight OPTIONS cho tất cả routes
+app.options('*', cors(corsOptions));
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
