@@ -24,12 +24,15 @@ const getFiles = async (req, res) => {
     }
 
     if (type) {
-      const typeMap = {
-        image: 'image',
-        video: 'video',
-        document: 'raw',
-      };
-      if (typeMap[type]) query.resourceType = typeMap[type];
+      if (type === 'image') {
+        query.resourceType = 'image';
+      } else if (type === 'video') {
+        // Video section shows both video and audio files
+        query.resourceType = 'video';
+      } else if (type === 'document') {
+        // Document section: only raw files, excluding audio (audio is stored as video resourceType now)
+        query.resourceType = 'raw';
+      }
     }
 
     if (starred === 'true') query.isStarred = true;
@@ -111,6 +114,13 @@ const uploadFiles = async (req, res) => {
       data: savedFiles,
     });
   } catch (error) {
+    // Cloudinary free plan rejects files > 10MB
+    if (error.message && error.message.includes('File size too large')) {
+      return res.status(413).json({
+        success: false,
+        message: 'File quá lớn! Cloudinary Free Plan chỉ hỗ trợ tối đa 10MB/file. Vui lòng chọn file nhỏ hơn hoặc nâng cấp gói dịch vụ.',
+      });
+    }
     res.status(500).json({ success: false, message: error.message });
   }
 };

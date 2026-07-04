@@ -1,13 +1,11 @@
 import { useState, useRef } from 'react';
-import { Search, Bell, Upload, Plus, Link } from 'lucide-react';
+import { Search, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import UrlUploadModal from '../Upload/UrlUploadModal';
 import './Header.css';
 
 export default function Header({ onSearch, onUpload }) {
   const [searchValue, setSearchValue] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isUrlModalOpen, setIsUrlModalOpen] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
 
@@ -49,35 +47,12 @@ export default function Header({ onSearch, onUpload }) {
 
       {/* Actions */}
       <div className="header-actions">
-        <button className="btn btn-ghost btn-icon header-notif" data-tooltip="Thông báo">
-          <Bell size={18} />
-        </button>
-
-        <button 
-          className="btn btn-secondary" 
-          onClick={() => setIsUrlModalOpen(true)} 
-          id="url-upload-btn"
-          title="Tải từ liên kết"
-        >
-          <Link size={16} />
-          Tải từ liên kết
-        </button>
-
+        <span className="vn-flag-circle" title="Made in Vietnam 🇻🇳">🇻🇳</span>
         <button className="btn btn-primary" onClick={onUpload} id="upload-btn">
           <Upload size={16} />
           Upload
         </button>
-
-        <button className="btn btn-secondary btn-icon" data-tooltip="Tạo thư mục" id="create-folder-btn">
-          <Plus size={18} />
-        </button>
       </div>
-
-      <UrlUploadModal 
-        isOpen={isUrlModalOpen} 
-        onClose={() => setIsUrlModalOpen(false)} 
-        onSuccess={() => window.location.reload()}
-      />
     </header>
   );
 }

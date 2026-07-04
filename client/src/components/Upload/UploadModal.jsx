@@ -49,7 +49,8 @@ export default function UploadModal({ isOpen, onClose, folderId, onSuccess }) {
       if (onSuccess) onSuccess();
       onClose();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Upload thất bại');
+      const msg = err.response?.data?.message || 'Upload thất bại';
+      toast.error(msg, { duration: 6000 });
     } finally {
       setUploading(false);
     }
@@ -80,7 +81,7 @@ export default function UploadModal({ isOpen, onClose, folderId, onSuccess }) {
               ) : (
                 <>
                   <p>Kéo thả file vào đây hoặc <span className="click-link">chọn file</span></p>
-                  <p className="dropzone-hint">Hỗ trợ mọi định dạng · Tối đa 100MB/file</p>
+                  <p className="dropzone-hint">Hỗ trợ mọi định dạng · Tối đa 100MB/file · <span style={{color:'var(--warning, #f59e0b)'}}>Ảnh tối đa 10MB (Cloudinary Free)</span></p>
                 </>
               )}
             </div>

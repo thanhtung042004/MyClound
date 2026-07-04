@@ -6,8 +6,10 @@ const cloudinary = require('../config/cloudinary');
 const getResourceType = (mimetype) => {
   if (mimetype.startsWith('image/')) return 'image';
   if (mimetype.startsWith('video/')) return 'video';
+  if (mimetype.startsWith('audio/')) return 'video'; // Cloudinary treats audio as video resource
   return 'raw';
 };
+
 
 const storage = new CloudinaryStorage({
   cloudinary,

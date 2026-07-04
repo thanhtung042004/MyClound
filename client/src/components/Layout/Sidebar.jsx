@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatBytes, getStoragePercent } from '../../utils/helpers';
 import {
-  LayoutDashboard, FolderOpen, Images, Video, FileText,
+  LayoutDashboard, FolderOpen, NotebookPen, LinkIcon,
   Star, Trash2, Share2, Settings, LogOut, HardDrive, Cloud
 } from 'lucide-react';
 import './Sidebar.css';
@@ -10,9 +10,8 @@ import './Sidebar.css';
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/files', icon: FolderOpen, label: 'Tất cả file' },
-  { to: '/files?type=image', icon: Images, label: 'Hình ảnh' },
-  { to: '/files?type=video', icon: Video, label: 'Video' },
-  { to: '/files?type=document', icon: FileText, label: 'Tài liệu' },
+  { to: '/notes', icon: NotebookPen, label: 'Ghi Chú' },
+  { to: '/download', icon: LinkIcon, label: 'Tải từ liên kết' },
 ];
 
 const bottomItems = [

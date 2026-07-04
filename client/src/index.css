@@ -46,6 +46,8 @@
   --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
   --header-bg: rgba(7, 7, 13, 0.85);
+  --bg-modal: #0f0f1e;
+  --bg-context-menu: #181828;
 }
 
 /* ===== Light Theme ===== */
@@ -70,6 +72,8 @@
   --shadow-glow: 0 0 30px rgba(108, 99, 255, 0.12);
 
   --header-bg: rgba(255, 255, 255, 0.92);
+  --bg-modal: #ffffff;
+  --bg-context-menu: #ffffff;
 }
 
 [data-theme="light"] body {
@@ -404,7 +408,7 @@ body {
 /* ===== Context Menu ===== */
 .context-menu {
   position: fixed;
-  background: #181828;
+  background: var(--bg-context-menu);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 4px;
@@ -495,7 +499,7 @@ body {
 }
 
 .modal {
-  background: #0f0f1e;
+  background: var(--bg-modal);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   max-width: 520px;

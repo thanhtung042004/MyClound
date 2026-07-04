@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import dashboardBg from '../../assets/auth-bg-dashboard.png';
 import { fileService } from '../../services';
 import { formatBytes, formatRelativeDate, getFileType, getFileColor } from '../../utils/helpers';
-import { HardDrive, Image, Video, FileText, TrendingUp, Upload, FolderPlus, Clock } from 'lucide-react';
+import { HardDrive, Image, Video, FileText, TrendingUp, Clock } from 'lucide-react';
 import FileCard from '../../components/FileCard/FileCard';
 import UploadModal from '../../components/Upload/UploadModal';
 import { useAuth } from '../../context/AuthContext';
@@ -12,7 +12,7 @@ import './Dashboard.css';
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [uploadOpen, setUploadOpen] = useState(false);
+
   const { user } = useAuth();
 
   const loadStats = async () => {
@@ -29,8 +29,10 @@ export default function DashboardPage() {
   useEffect(() => { loadStats(); }, []);
 
   const storagePercent = stats
-    ? Math.min(Math.round((stats.storageUsed / stats.storageLimit) * 100), 100)
+    ? Math.min(parseFloat(((stats.storageUsed / stats.storageLimit) * 100).toFixed(1)), 100)
     : 0;
+  // Visual arc: show at least 2% if there's any data so the arc is always visible
+  const arcPercent = storagePercent > 0 ? Math.max(storagePercent, 2) : 0;
 
   const statCards = [
     {
@@ -75,14 +77,7 @@ export default function DashboardPage() {
           </h1>
           <p className="dashboard-subtitle">Đây là tổng quan lưu trữ của bạn</p>
         </div>
-        <div className="dashboard-welcome-actions">
-          <button className="btn btn-secondary" id="create-folder-dash-btn">
-            <FolderPlus size={16} /> Tạo thư mục
-          </button>
-          <button className="btn btn-primary" onClick={() => setUploadOpen(true)} id="upload-dash-btn">
-            <Upload size={16} /> Upload file
-          </button>
-        </div>
+
       </div>
 
       {/* Stats Grid */}
@@ -112,7 +107,7 @@ export default function DashboardPage() {
           <div className="storage-visual">
             <div className="storage-donut-wrapper">
               <svg viewBox="0 0 100 100" className="storage-donut">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                <circle cx="50" cy="50" r="40" fill="none" className="donut-track" strokeWidth="8" />
                 <circle
                   cx="50"
                   cy="50"
@@ -121,7 +116,7 @@ export default function DashboardPage() {
                   stroke="url(#grad)"
                   strokeWidth="8"
                   strokeLinecap="round"
-                  strokeDasharray={`${storagePercent * 2.513} 251.3`}
+                  strokeDasharray={`${arcPercent * 2.513} 251.3`}
                   transform="rotate(-90 50 50)"
                   style={{ transition: 'stroke-dasharray 0.6s ease' }}
                 />
@@ -131,10 +126,10 @@ export default function DashboardPage() {
                     <stop offset="100%" stopColor="#3ecfcf" />
                   </linearGradient>
                 </defs>
-                <text x="50" y="46" textAnchor="middle" fill="white" fontSize="16" fontWeight="700" fontFamily="Inter">
+                <text x="50" y="46" textAnchor="middle" className="donut-text-main" fontSize="14" fontWeight="700" fontFamily="Inter">
                   {storagePercent}%
                 </text>
-                <text x="50" y="60" textAnchor="middle" fill="#9ca3b8" fontSize="7" fontFamily="Inter">
+                <text x="50" y="60" textAnchor="middle" className="donut-text-sub" fontSize="7" fontFamily="Inter">
                   đã dùng
                 </text>
               </svg>
@@ -203,11 +198,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <UploadModal
-        isOpen={uploadOpen}
-        onClose={() => setUploadOpen(false)}
-        onSuccess={loadStats}
-      />
+
     </div>
   );
 }

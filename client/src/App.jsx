@@ -10,6 +10,8 @@ import FilesPage from './pages/Files/FilesPage';
 import SharedPage from './pages/Shared/SharedPage';
 import TrashPage from './pages/Trash/TrashPage';
 import SettingsPage from './pages/Settings/SettingsPage';
+import NotesPage from './pages/Notes/NotesPage';
+import DownloadPage from './pages/Download/DownloadPage';
 import './index.css';
 
 function App() {
@@ -44,6 +46,8 @@ function App() {
               <Route path="/shared" element={<SharedPage />} />
               <Route path="/trash" element={<TrashPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/notes" element={<NotesPage />} />
+              <Route path="/download" element={<DownloadPage />} />
             </Route>
 
             {/* Default */}

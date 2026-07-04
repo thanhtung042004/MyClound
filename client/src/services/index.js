@@ -40,3 +40,10 @@ export const downloadService = {
   downloadFromUrl: (data) => api.post('/download/from-url', data),
   downloadToDevice: (data) => api.post('/download/to-device', data, { responseType: 'blob' }),
 };
+
+export const noteService = {
+  getNotes: (params) => api.get('/notes', { params }),
+  createNote: (data) => api.post('/notes', data),
+  updateNote: (id, data) => api.put(`/notes/${id}`, data),
+  deleteNote: (id) => api.delete(`/notes/${id}`),
+};

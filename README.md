@@ -2,9 +2,7 @@
 
 [![Vercel Deploy](https://img.shields.io/badge/Vercel-Deploy-00C7B7?logo=vercel)](https://vercel.com)  [![Render Deploy](https://img.shields.io/badge/Render-Deploy-000?logo=render)](https://render.com)  [![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js)](https://nodejs.org)  [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org)
 
-> **MyClound** – Ứng dụng lưu trữ đám mây cá nhân được xây dựng bằng **React**, **Node.js**, **MongoDB** và **Cloudinary**. Giao diện hiện đại, hỗ trợ dark mode và quản lý tệp đầy đủ, chạy trên cả desktop và mobile.
-
----
+> **MyClound** – Ứng dụng lưu trữ đám mây cá nhân được xây dựng bằng **React**, **Node.js**, **MongoDB** và **Cloudinary**. 
 
 ## 📸 Ảnh chụp màn hình
 
@@ -117,6 +115,4 @@ npm run dev
 
 ---
 
-## 📄 Giấy phép
 
-MIT © 2024‑2026 **Thanh Tung**

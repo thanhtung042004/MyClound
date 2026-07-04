@@ -140,6 +140,23 @@
   height: 130px;
 }
 
+/* Donut track ring — adapts to theme */
+.donut-track {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+[data-theme="light"] .donut-track {
+  stroke: rgba(0, 0, 0, 0.1);
+}
+
+/* Donut center text */
+.donut-text-main {
+  fill: var(--text-primary);
+}
+.donut-text-sub {
+  fill: var(--text-secondary);
+}
+
+
 .storage-breakdown {
   flex: 1;
   display: flex;

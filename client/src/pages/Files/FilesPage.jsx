@@ -38,17 +38,21 @@ export default function FilesPage() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [filesRes, foldersRes] = await Promise.all([
+      // Only fetch folders when not filtering by type (folders are type-agnostic)
+      const requests = [
         fileService.getFiles({
           folder: currentFolder || '',
           type: typeFilter,
           search: searchQuery,
           sort,
         }),
-        folderService.getFolders({ parent: currentFolder || '' }),
-      ]);
+      ];
+      if (!typeFilter && !searchQuery) {
+        requests.push(folderService.getFolders({ parent: currentFolder || '' }));
+      }
+      const [filesRes, foldersRes] = await Promise.all(requests);
       setFiles(filesRes.data.data);
-      setFolders(foldersRes.data.data);
+      setFolders(foldersRes ? foldersRes.data.data : []);
     } catch {
       toast.error('Không thể tải dữ liệu');
     } finally {
