@@ -48,6 +48,9 @@
   --header-bg: rgba(7, 7, 13, 0.85);
   --bg-modal: #0f0f1e;
   --bg-context-menu: #181828;
+
+  /* Tell browser to use dark native UI (fixes select dropdowns, scrollbars, etc.) */
+  color-scheme: dark;
 }
 
 /* ===== Light Theme ===== */
@@ -74,6 +77,9 @@
   --header-bg: rgba(255, 255, 255, 0.92);
   --bg-modal: #ffffff;
   --bg-context-menu: #ffffff;
+
+  /* Switch native UI back to light */
+  color-scheme: light;
 }
 
 [data-theme="light"] body {

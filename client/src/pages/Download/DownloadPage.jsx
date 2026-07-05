@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, CheckCircle, AlertCircle, File, DownloadCloud, Download as DownloadIcon, Video, Music, Globe } from 'lucide-react';
+import { Link, CheckCircle, AlertCircle, File, DownloadCloud, Download as DownloadIcon, Video, Music } from 'lucide-react';
 import { downloadService } from '../../services';
 import toast from 'react-hot-toast';
 import './DownloadPage.css';
@@ -90,7 +90,7 @@ export default function DownloadPage() {
       {/* Hero */}
       <div className="dl-hero">
         <div className="dl-hero-icon">
-          <Globe size={32} />
+          <img src="/logoTailienket.jpg" alt="Tải từ liên kết" className="dl-hero-logo" />
         </div>
         <div>
           <h1 className="dl-hero-title">Tải từ liên kết</h1>

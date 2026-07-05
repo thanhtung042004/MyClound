@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { formatBytes, getStoragePercent } from '../../utils/helpers';
 import {
   LayoutDashboard, FolderOpen, NotebookPen, LinkIcon,
-  Star, Trash2, Share2, Settings, LogOut, HardDrive, Cloud
+  Star, Trash2, Share2, Settings, LogOut, HardDrive
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -35,7 +35,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="sidebar-logo">
         <div className="logo-icon">
-          <Cloud size={20} />
+          <img src="/Gemini_Generated_Image_ug8lf4ug8lf4ug8l.jpg" alt="MyClound" className="logo-img" />
         </div>
         <span className="logo-text">MyClound</span>
       </div>
