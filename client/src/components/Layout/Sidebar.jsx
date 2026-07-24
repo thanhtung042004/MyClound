@@ -1,29 +1,32 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { formatBytes, getStoragePercent } from '../../utils/helpers';
 import {
   LayoutDashboard, FolderOpen, NotebookPen, LinkIcon,
-  Star, Trash2, Share2, Settings, LogOut, HardDrive
+  Star, Trash2, Share2, Settings, LogOut, HardDrive, Bookmark
 } from 'lucide-react';
 import './Sidebar.css';
 
-const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/files', icon: FolderOpen, label: 'Tất cả file' },
-  { to: '/notes', icon: NotebookPen, label: 'Ghi Chú' },
-  { to: '/download', icon: LinkIcon, label: 'Tải từ liên kết' },
-];
-
-const bottomItems = [
-  { to: '/starred', icon: Star, label: 'Đã gắn sao' },
-  { to: '/shared', icon: Share2, label: 'Đã chia sẻ' },
-  { to: '/trash', icon: Trash2, label: 'Thùng rác' },
-];
-
 export default function Sidebar() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const storagePercent = getStoragePercent(user?.storageUsed, user?.storageLimit);
+
+  const navItems = [
+    { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') },
+    { to: '/files', icon: FolderOpen, label: t('nav.files') },
+    { to: '/notes', icon: NotebookPen, label: t('nav.notes') },
+    { to: '/links', icon: Bookmark, label: t('nav.links') },
+    { to: '/download', icon: LinkIcon, label: t('nav.download') },
+  ];
+
+  const bottomItems = [
+    { to: '/starred', icon: Star, label: t('nav.starred') },
+    { to: '/shared', icon: Share2, label: t('nav.shared') },
+    { to: '/trash', icon: Trash2, label: t('nav.trash') },
+  ];
 
   const handleLogout = () => {
     logout();
@@ -42,7 +45,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="sidebar-nav">
-        <p className="nav-section-label">Chính</p>
+        <p className="nav-section-label">{t('nav.main')}</p>
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -54,7 +57,7 @@ export default function Sidebar() {
           </NavLink>
         ))}
 
-        <p className="nav-section-label" style={{ marginTop: '24px' }}>Thư viện</p>
+        <p className="nav-section-label" style={{ marginTop: '24px' }}>{t('nav.library')}</p>
         {bottomItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -71,11 +74,11 @@ export default function Sidebar() {
       <div className="sidebar-storage">
         <div className="storage-header">
           <HardDrive size={16} />
-          <span>Bộ nhớ</span>
+          <span>{t('storage.label')}</span>
         </div>
         <div className="storage-bar">
           <div
-            className="storage-fill"
+            className={`storage-fill ${storagePercent >= 95 ? 'danger' : storagePercent >= 80 ? 'warning' : ''}`}
             style={{ width: `${storagePercent}%` }}
           />
         </div>
@@ -104,14 +107,14 @@ export default function Sidebar() {
           <button
             className="btn btn-ghost btn-icon"
             onClick={() => navigate('/settings')}
-            data-tooltip="Cài đặt"
+            data-tooltip={t('nav.settings')}
           >
             <Settings size={18} />
           </button>
           <button
             className="btn btn-ghost btn-icon"
             onClick={handleLogout}
-            data-tooltip="Đăng xuất"
+            data-tooltip={t('nav.logout')}
           >
             <LogOut size={18} />
           </button>

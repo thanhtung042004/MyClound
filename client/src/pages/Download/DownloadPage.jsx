@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, CheckCircle, AlertCircle, File, DownloadCloud, Download as DownloadIcon, Video, Music } from 'lucide-react';
 import { downloadService } from '../../services';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 import './DownloadPage.css';
 
@@ -11,6 +12,7 @@ export default function DownloadPage() {
   const [urlInfo, setUrlInfo] = useState(null);
   const [selectedFormat, setSelectedFormat] = useState('video');
   const [error, setError] = useState('');
+  const { t } = useLanguage();
 
   const handleCheckUrl = async () => {
     if (!url.trim()) return;
@@ -21,7 +23,7 @@ export default function DownloadPage() {
       setUrlInfo(data);
       if (data.formats?.length) setSelectedFormat(data.formats[0]);
     } catch (err) {
-      setError(err.response?.data?.message || 'Không thể kiểm tra URL này. Bạn vẫn có thể thử tải xuống trực tiếp.');
+      setError(err.response?.data?.message || 'Cannot check this URL. You can still try downloading directly.');
       setUrlInfo({ type: 'unknown', formats: ['original'] });
       setSelectedFormat('original');
     } finally {
@@ -40,13 +42,13 @@ export default function DownloadPage() {
     if (!url.trim()) return;
     setIsDownloading(true);
     setError('');
-    const toastId = toast.loading('Đang tải file từ URL...');
+    const toastId = toast.loading(t('download.saving'));
     try {
       await downloadService.downloadFromUrl({ url, format: selectedFormat });
       toast.success('Đã lưu vào MyClound thành công!', { id: toastId });
       handleReset();
     } catch (err) {
-      const msg = err.response?.data?.message || 'Tải file thất bại';
+      const msg = err.response?.data?.message || t('toast.uploadFail');
       setError(msg);
       toast.error(msg, { id: toastId });
     } finally {
@@ -58,7 +60,7 @@ export default function DownloadPage() {
     if (!url.trim()) return;
     setIsDownloading(true);
     setError('');
-    const toastId = toast.loading('Đang tải file về máy...');
+    const toastId = toast.loading(t('download.downloading'));
     try {
       const response = await downloadService.downloadToDevice({ url, format: selectedFormat });
       const blob = new Blob([response.data], { type: response.headers['content-type'] });
@@ -90,13 +92,11 @@ export default function DownloadPage() {
       {/* Hero */}
       <div className="dl-hero">
         <div className="dl-hero-icon">
-          <img src="/logoTailienket.jpg" alt="Tải từ liên kết" className="dl-hero-logo" />
+          <img src="/logoTailienket.jpg" alt={t('download.title')} className="dl-hero-logo" />
         </div>
         <div>
-          <h1 className="dl-hero-title">Tải từ liên kết</h1>
-          <p className="dl-hero-sub">
-            Dán link YouTube, TikTok, Facebook, Twitter hoặc URL file trực tiếp để tải về
-          </p>
+          <h1 className="dl-hero-title">{t('download.title')}</h1>
+          <p className="dl-hero-sub">{t('download.subtitle')}</p>
         </div>
       </div>
 
@@ -108,7 +108,7 @@ export default function DownloadPage() {
             <Link size={16} className="dl-input-icon" />
             <input
               type="text"
-              placeholder="Dán liên kết vào đây... (YouTube, TikTok, Facebook, URL file...)"
+              placeholder={t('download.placeholder')}
               className="dl-input"
               value={url}
               onChange={(e) => { setUrl(e.target.value); setUrlInfo(null); setError(''); }}
@@ -127,12 +127,12 @@ export default function DownloadPage() {
               id="dl-check-btn"
             >
               {isLoadingInfo ? (
-                <><span className="spinner" style={{ width: 16, height: 16 }} /> Kiểm tra...</>
-              ) : 'Kiểm tra'}
+                <><span className="spinner" style={{ width: 16, height: 16 }} /> {t('download.checking')}</>
+              ) : t('download.check')}
             </button>
           ) : (
             <button className="btn btn-secondary dl-check-btn" onClick={handleReset}>
-              Thử link khác
+              {t('download.tryAnother')}
             </button>
           )}
         </div>
@@ -159,7 +159,7 @@ export default function DownloadPage() {
                 <p className="dl-info-title">{urlInfo.title || 'File'}</p>
                 {urlInfo.platform && (
                   <p className="dl-info-meta">
-                    Nền tảng: <span style={{ textTransform: 'capitalize', color: 'var(--accent-purple)' }}>{urlInfo.platform}</span>
+                    {t('download.platform')} <span style={{ textTransform: 'capitalize', color: 'var(--accent-purple)' }}>{urlInfo.platform}</span>
                   </p>
                 )}
                 {urlInfo.mimeType && (
@@ -167,14 +167,14 @@ export default function DownloadPage() {
                 )}
                 <div className="dl-info-badge">
                   <CheckCircle size={13} style={{ color: 'var(--success)' }} />
-                  <span style={{ color: 'var(--success)' }}>Sẵn sàng tải xuống</span>
+                  <span style={{ color: 'var(--success)' }}>{t('download.ready')}</span>
                 </div>
               </div>
             </div>
 
             {urlInfo.formats && urlInfo.formats.length > 1 && (
               <div className="dl-format-row">
-                <p className="form-label">Chọn định dạng:</p>
+                <p className="form-label">{t('download.format')}</p>
                 <div className="dl-format-options">
                   {urlInfo.formats.includes('video') && (
                     <button
@@ -191,7 +191,7 @@ export default function DownloadPage() {
                       onClick={() => setSelectedFormat('mp3')}
                       disabled={isDownloading}
                     >
-                      <Music size={15} /> Âm thanh (MP3)
+                      <Music size={15} /> Audio (MP3)
                     </button>
                   )}
                 </div>
@@ -206,7 +206,7 @@ export default function DownloadPage() {
                 id="dl-to-device-btn"
               >
                 <DownloadIcon size={16} />
-                {isDownloading ? 'Đang tải...' : 'Tải về máy'}
+                {isDownloading ? t('download.downloading') : t('download.toDevice')}
               </button>
               <button
                 className="btn btn-primary"
@@ -215,7 +215,7 @@ export default function DownloadPage() {
                 id="dl-to-cloud-btn"
               >
                 <DownloadCloud size={16} />
-                {isDownloading ? 'Đang lưu...' : 'Lưu vào MyClound'}
+                {isDownloading ? t('download.saving') : t('download.toCloud')}
               </button>
             </div>
           </div>
@@ -224,9 +224,9 @@ export default function DownloadPage() {
 
       {/* Supported platforms */}
       <div className="dl-platforms">
-        <p className="dl-platforms-label">Hỗ trợ tải từ</p>
+        <p className="dl-platforms-label">{t('download.supportedLabel')}</p>
         <div className="dl-platform-list">
-          {['YouTube', 'TikTok', 'Facebook', 'Twitter / X', 'Instagram', 'URL trực tiếp'].map(p => (
+          {t('download.platforms').map(p => (
             <span key={p} className="dl-platform-tag">{p}</span>
           ))}
         </div>

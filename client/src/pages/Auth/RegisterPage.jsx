@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Eye, EyeOff, Cloud, Loader, User, Mail, Lock, Shield, HardDrive, Wifi } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useLanguage } from '../../context/LanguageContext';
 import bgRegister from '../../assets/auth-bg-register.png.png';
 import './Auth.css';
 
@@ -14,34 +15,35 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.password) {
-      toast.error('Vui lòng điền đầy đủ thông tin');
+      toast.error(t('toast.fillAll'));
       return;
     }
     if (form.password.length < 6) {
-      toast.error('Mật khẩu phải ít nhất 6 ký tự');
+      toast.error(t('toast.passwordMin6'));
       return;
     }
     if (form.password !== form.confirm) {
-      toast.error('Mật khẩu xác nhận không khớp');
+      toast.error(t('toast.passwordMismatch'));
       return;
     }
     if (!agreed) {
-      toast.error('Vui lòng đồng ý với điều khoản sử dụng');
+      toast.error(t('toast.agreeTerms'));
       return;
     }
     setLoading(true);
     try {
       await register(form.name, form.email, form.password);
-      toast.success('Đăng ký thành công! Chào mừng bạn!');
+      toast.success(t('toast.registerSuccess'));
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Đăng ký thất bại');
+      toast.error(err.response?.data?.message || t('toast.registerFail'));
     } finally {
       setLoading(false);
     }
@@ -63,20 +65,24 @@ export default function RegisterPage() {
 
       {/* Tagline - bottom left of page */}
       <div className="auth-left-tagline">
-        <h2>Lưu trữ tối giản<br />Kết nối vô hạn</h2>
-        <p>MyClound – Không gian lưu trữ đám mây<br />an toàn, bảo mật và luôn bên bạn.</p>
+        <h2>{t('auth.register.taglineTitle').split('\n').map((line, i) => (
+          <span key={i}>{line}{i === 0 ? <br /> : ''}</span>
+        ))}</h2>
+        <p>{t('auth.register.taglineDesc').split('\n').map((line, i) => (
+          <span key={i}>{line}{i === 0 ? <br /> : ''}</span>
+        ))}</p>
         <div className="auth-features">
           <div className="auth-feature-item">
             <HardDrive size={20} color="#ffffff" />
-            <span>Lưu trữ an toàn</span>
+            <span>{t('auth.register.featureStorage')}</span>
           </div>
           <div className="auth-feature-item">
             <Shield size={20} color="#ffffff" />
-            <span>Bảo mật tuyệt đối</span>
+            <span>{t('auth.register.featureSecurity')}</span>
           </div>
           <div className="auth-feature-item">
             <Wifi size={20} color="#ffffff" />
-            <span>Truy cập mọi lúc</span>
+            <span>{t('auth.register.featureAccess')}</span>
           </div>
         </div>
       </div>
@@ -85,8 +91,8 @@ export default function RegisterPage() {
       <div className="auth-card">
         {/* Heading */}
         <div className="auth-heading-center">
-          <h1>Tạo tài khoản MyClound</h1>
-          <p>Bắt đầu hành trình lưu trữ của bạn</p>
+          <h1>{t('auth.register.title')}</h1>
+          <p>{t('auth.register.subtitle')}</p>
         </div>
 
         {/* Form */}
@@ -99,7 +105,7 @@ export default function RegisterPage() {
               name="name"
               type="text"
               className="auth-input"
-              placeholder="Họ và tên"
+              placeholder={t('auth.register.namePlaceholder')}
               value={form.name}
               onChange={handleChange}
               autoComplete="name"
@@ -114,7 +120,7 @@ export default function RegisterPage() {
               name="email"
               type="email"
               className="auth-input"
-              placeholder="Email"
+              placeholder={t('auth.register.emailPlaceholder')}
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
@@ -129,7 +135,7 @@ export default function RegisterPage() {
               name="password"
               type={showPass ? 'text' : 'password'}
               className="auth-input has-eye"
-              placeholder="Mật khẩu"
+              placeholder={t('auth.register.passwordPlaceholder')}
               value={form.password}
               onChange={handleChange}
             />
@@ -146,7 +152,7 @@ export default function RegisterPage() {
               name="confirm"
               type={showConfirm ? 'text' : 'password'}
               className="auth-input has-eye"
-              placeholder="Xác nhận mật khẩu"
+              placeholder={t('auth.register.confirmPlaceholder')}
               value={form.confirm}
               onChange={handleChange}
             />
@@ -158,16 +164,16 @@ export default function RegisterPage() {
           {/* Terms */}
           <label className="auth-terms">
             <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} id="register-terms" />
-            Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a>
+            {t('auth.register.terms')} <a href="#">{t('auth.register.termsLink')}</a> {t('auth.register.termsAnd')} <a href="#">{t('auth.register.privacyLink')}</a>
           </label>
 
           {/* Submit */}
           <button id="register-submit-btn" type="submit" className="auth-btn-primary auth-btn-register" disabled={loading}>
-            {loading ? <><Loader size={15} className="auth-spin" /> Đang tạo tài khoản...</> : 'Đăng ký'}
+            {loading ? <><Loader size={15} className="auth-spin" /> {t('auth.register.submitting')}</> : t('auth.register.submit')}
           </button>
 
           {/* Divider */}
-          <div className="auth-divider">hoặc</div>
+          <div className="auth-divider">{t('auth.register.divider')}</div>
 
           {/* Social */}
           <div className="auth-social-row">
@@ -178,19 +184,19 @@ export default function RegisterPage() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
-              Đăng ký với Google
+              {t('auth.register.googleBtn')}
             </button>
             <button type="button" className="auth-social-btn">
               <svg className="apple-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
               </svg>
-              Đăng ký với Apple
+              {t('auth.register.appleBtn')}
             </button>
           </div>
         </form>
 
         <p className="auth-switch" style={{ marginTop: '18px' }}>
-          Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
+          {t('auth.register.hasAccount')} <Link to="/login">{t('auth.register.loginLink')}</Link>
         </p>
       </div>
     </div>

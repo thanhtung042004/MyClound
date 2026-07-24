@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X, Download, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { formatBytes, formatDate } from '../../utils/helpers';
+import { useLanguage } from '../../context/LanguageContext';
 import './Modal.css';
 
 export default function PreviewModal({ file, onClose, files = [], onNavigate }) {
   const [zoom, setZoom] = useState(1);
+  const { t } = useLanguage();
   const currentIndex = files.findIndex(f => f._id === file._id);
 
   const handlePrev = useCallback(() => {
@@ -53,7 +55,7 @@ export default function PreviewModal({ file, onClose, files = [], onNavigate }) 
             </>
           )}
           <a href={file.secureUrl} download={file.originalName} className="btn btn-secondary btn-sm">
-            <Download size={16} /> Tải xuống
+            <Download size={16} /> {t('previewModal.download')}
           </a>
           <button className="btn btn-ghost btn-icon" onClick={onClose}>
             <X size={18} />
@@ -98,10 +100,10 @@ export default function PreviewModal({ file, onClose, files = [], onNavigate }) 
           {!isImage && !isVideo && !isPdf && (
             <div className="preview-unsupported">
               <div className="preview-file-icon">📄</div>
-              <p>Không thể xem trước file này</p>
+              <p>{t('previewModal.unsupported')}</p>
               <p className="preview-format">{file.format?.toUpperCase()}</p>
               <a href={file.secureUrl} download={file.originalName} className="btn btn-primary" style={{ marginTop: 16 }}>
-                <Download size={16} /> Tải xuống để xem
+                <Download size={16} /> {t('previewModal.downloadToView')}
               </a>
             </div>
           )}

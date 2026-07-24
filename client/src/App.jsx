@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage';
@@ -12,12 +13,14 @@ import TrashPage from './pages/Trash/TrashPage';
 import SettingsPage from './pages/Settings/SettingsPage';
 import NotesPage from './pages/Notes/NotesPage';
 import DownloadPage from './pages/Download/DownloadPage';
+import LinksPage from './pages/Links/LinksPage';
 import './index.css';
 
 function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
+        <LanguageProvider>
         <AuthProvider>
           <Toaster
             position="top-right"
@@ -48,6 +51,7 @@ function App() {
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/notes" element={<NotesPage />} />
               <Route path="/download" element={<DownloadPage />} />
+              <Route path="/links" element={<LinksPage />} />
             </Route>
 
             {/* Default */}
@@ -55,6 +59,7 @@ function App() {
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </AuthProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </BrowserRouter>
   );

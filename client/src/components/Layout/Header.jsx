@@ -1,56 +1,95 @@
-import { useState, useRef } from 'react';
-import { Search, Upload } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Search, Upload, FolderPlus } from 'lucide-react';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
 import './Header.css';
 
-export default function Header({ onSearch, onUpload }) {
-  const [searchValue, setSearchValue] = useState('');
+export default function Header({ onSearch, onUpload, onCreateFolder }) {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const urlQuery = searchParams.get('search') || '';
+
+  const [searchValue, setSearchValue] = useState(urlQuery);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef(null);
-  const navigate = useNavigate();
+  const { t, currentLang } = useLanguage();
 
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchValue(value);
-    if (onSearch) onSearch(value);
+  // Keep search input synced with URL parameter
+  useEffect(() => {
+    setSearchValue(urlQuery);
+  }, [urlQuery]);
+
+  const doSearch = (query) => {
+    const trimmed = query.trim();
+    if (onSearch) onSearch(trimmed);
+
+    if (trimmed) {
+      navigate(`/files?search=${encodeURIComponent(trimmed)}`);
+    } else if (location.pathname === '/files') {
+      navigate('/files');
+    }
   };
 
-  const handleSearchSubmit = (e) => {
-    if (e.key === 'Enter' && searchValue.trim()) {
-      navigate(`/files?search=${encodeURIComponent(searchValue.trim())}`);
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    // Realtime search if already on files page or live search
+    doSearch(value);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      doSearch(searchValue);
     }
+  };
+
+  const handleClear = () => {
+    setSearchValue('');
+    doSearch('');
   };
 
   return (
     <header className="app-header">
       {/* Search */}
       <div className={`header-search ${isSearchFocused ? 'focused' : ''}`}>
-        <Search size={16} className="search-icon" />
+        <Search size={15} className="search-icon" onClick={() => doSearch(searchValue)} style={{ cursor: 'pointer' }} />
         <input
           ref={searchRef}
           type="text"
-          placeholder="Tìm kiếm file, thư mục..."
+          placeholder={t('header.search')}
           value={searchValue}
-          onChange={handleSearch}
-          onKeyDown={handleSearchSubmit}
+          onChange={handleSearchChange}
+          onKeyDown={handleSearchKeyDown}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setIsSearchFocused(false)}
           className="search-input"
         />
         {searchValue && (
-          <span className="search-shortcut" onClick={() => {
-            setSearchValue('');
-            if (onSearch) onSearch('');
-          }}>✕</span>
+          <span className="search-clear" onClick={handleClear}>✕</span>
         )}
+        <kbd className="search-kbd">⌘K</kbd>
       </div>
 
       {/* Actions */}
       <div className="header-actions">
-        <span className="vn-flag-circle" title="Made in Vietnam 🇻🇳">🇻🇳</span>
-        <button className="btn btn-primary" onClick={onUpload} id="upload-btn">
-          <Upload size={16} />
-          Upload
+        {/* Language badge */}
+        <span className="header-lang-badge" title={currentLang.nativeLabel}>
+          {currentLang.flag}
+        </span>
+
+        {/* New Folder */}
+        {onCreateFolder && (
+          <button className="btn btn-secondary header-folder-btn" onClick={onCreateFolder} id="header-folder-btn">
+            <FolderPlus size={15} />
+            <span className="header-btn-label">{t('files.newFolder')}</span>
+          </button>
+        )}
+
+        {/* Upload */}
+        <button className="btn btn-primary header-upload-btn" onClick={onUpload} id="upload-btn">
+          <Upload size={15} />
+          <span>{t('header.upload')}</span>
         </button>
       </div>
     </header>

@@ -13,14 +13,20 @@ const getFiles = async (req, res) => {
       isTrashed: trashed === 'true',
     };
 
-    if (folder === 'null' || folder === '') {
-      query.folder = null;
-    } else if (folder) {
-      query.folder = folder;
-    }
-
-    if (search) {
-      query.$text = { $search: search };
+    // Search logic
+    if (search && search.trim()) {
+      query.name = { $regex: search.trim(), $options: 'i' };
+      // If a specific folder ID is provided, search inside that folder; otherwise search all folders
+      if (folder && folder !== 'null' && folder !== '') {
+        query.folder = folder;
+      }
+    } else {
+      // Normal browsing: filter by folder
+      if (folder === 'null' || folder === '') {
+        query.folder = null;
+      } else if (folder) {
+        query.folder = folder;
+      }
     }
 
     if (type) {

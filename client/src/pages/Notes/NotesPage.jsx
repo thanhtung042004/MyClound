@@ -5,6 +5,7 @@ import {
   ChevronLeft, ChevronRight, Bold, Italic, Underline as UnderlineIcon, Type, ChevronDown,
   AlignLeft, AlignCenter, AlignRight,
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 import './NotesPage.css';
 
@@ -80,6 +81,8 @@ export default function NotesPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [formatState, setFormatState] = useState({ bold: false, italic: false, underline: false, align: 'left' });
 
+  const { t } = useLanguage();
+
   const saveTimer = useRef(null);
   const renameInputRef = useRef(null);
   const editorRef = useRef(null);
@@ -95,11 +98,11 @@ export default function NotesPage() {
       const res = await noteService.getNotes({ sort: '-updatedAt' });
       setNotes(res.data.data);
     } catch {
-      toast.error('Không thể tải ghi chú');
+      toast.error(t('toast.loadNotesFail'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => { loadNotes(); }, [loadNotes]);
 
@@ -114,12 +117,12 @@ export default function NotesPage() {
   // ── CRUD ────────────────────────────────────────────────────────────────────
   const handleCreate = async () => {
     try {
-      const res = await noteService.createNote({ title: 'Ghi chú mới', content: '' });
+      const res = await noteService.createNote({ title: t('notes.newNoteTitle'), content: '' });
       const newNote = res.data.data;
       setNotes(prev => [newNote, ...prev]);
       setActiveNote(newNote);
     } catch {
-      toast.error('Tạo ghi chú thất bại');
+      toast.error(t('toast.createNoteFail'));
     }
   };
 
@@ -139,7 +142,7 @@ export default function NotesPage() {
         });
         setNotes(prev => prev.map(n => n._id === updated._id ? res.data.data : n));
       } catch {
-        toast.error('Lưu thất bại');
+        toast.error(t('toast.saveFail'));
       } finally {
         setSaving(false);
       }
@@ -170,20 +173,20 @@ export default function NotesPage() {
       setNotes(prev => prev.map(n => n._id === note._id ? updated : n));
       if (activeNote?._id === note._id) setActiveNote(updated);
     } catch {
-      toast.error('Thao tác thất bại');
+      toast.error(t('toast.actionFail'));
     }
   };
 
   const handleDelete = async (note, e) => {
     e.stopPropagation();
-    if (!confirm(`Xóa ghi chú "${note.title}"?`)) return;
+    if (!confirm(t('confirm.deleteNote').replace('{title}', note.title))) return;
     try {
       await noteService.deleteNote(note._id);
       setNotes(prev => prev.filter(n => n._id !== note._id));
       if (activeNote?._id === note._id) setActiveNote(null);
-      toast.success('Đã xóa ghi chú');
+      toast.success(t('toast.noteDeleteSuccess'));
     } catch {
-      toast.error('Xóa thất bại');
+      toast.error(t('toast.noteDeleteFail'));
     }
   };
 
@@ -205,9 +208,9 @@ export default function NotesPage() {
       const updated = res.data.data;
       setNotes(prev => prev.map(n => n._id === noteId ? updated : n));
       if (activeNote?._id === noteId) setActiveNote(updated);
-      toast.success('Đã đổi tên ghi chú');
+      toast.success(t('toast.noteRenameSuccess'));
     } catch {
-      toast.error('Đổi tên thất bại');
+      toast.error(t('toast.noteRenameFail'));
     } finally {
       cancelRename();
     }
@@ -272,7 +275,7 @@ export default function NotesPage() {
       setActiveNote(updated);
       setNotes(prev => prev.map(n => n._id === updated._id ? updated : n));
     } catch {
-      toast.error('Cập nhật thất bại');
+      toast.error(t('toast.updateFail'));
     }
   };
 
@@ -319,17 +322,17 @@ export default function NotesPage() {
             <>
               <div className="notes-title-row">
                 <NotebookPen size={20} className="notes-icon" />
-                <h1 className="notes-heading">Ghi Chú</h1>
+                <h1 className="notes-heading">{t('notes.title')}</h1>
               </div>
               <button className="btn btn-primary btn-sm" onClick={handleCreate} id="new-note-btn">
-                <Plus size={16} /> Mới
+                <Plus size={16} /> {t('notes.new')}
               </button>
             </>
           )}
           <button
             className="notes-sidebar-toggle"
             onClick={() => setSidebarCollapsed(c => !c)}
-            title={sidebarCollapsed ? 'Mở rộng danh sách' : 'Thu gọn danh sách'}
+            title={sidebarCollapsed ? t('notes.expandSidebar') : t('notes.collapseSidebar')}
           >
             {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           </button>
@@ -337,7 +340,7 @@ export default function NotesPage() {
 
         {sidebarCollapsed ? (
           <div className="notes-sidebar-mini">
-            <button className="btn btn-primary btn-icon" onClick={handleCreate} title="Tạo ghi chú mới">
+            <button className="btn btn-primary btn-icon" onClick={handleCreate} title={t('notes.createNew')}>
               <Plus size={16} />
             </button>
           </div>
@@ -347,7 +350,7 @@ export default function NotesPage() {
               <Search size={15} className="notes-search-icon" />
               <input
                 className="notes-search-input"
-                placeholder="Tìm kiếm ghi chú..."
+                placeholder={t('notes.search')}
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
@@ -365,8 +368,8 @@ export default function NotesPage() {
                 ))
               ) : filteredNotes.length === 0 ? (
                 <div className="notes-empty-list">
-                  <span>Chưa có ghi chú nào</span>
-                  <button className="btn btn-primary btn-sm" onClick={handleCreate}>Tạo ngay</button>
+                  <span>{t('notes.emptyList')}</span>
+                  <button className="btn btn-primary btn-sm" onClick={handleCreate}>{t('notes.createNow')}</button>
                 </div>
               ) : (
                 filteredNotes.map(note => (
@@ -395,13 +398,13 @@ export default function NotesPage() {
                         <p
                           className="note-item-title"
                           onDoubleClick={e => startRename(note, e)}
-                          title="Double-click để đổi tên"
+                          title={t('notes.doubleClickRename')}
                         >
-                          {note.title || 'Không có tiêu đề'}
+                          {note.title || t('notes.noTitle')}
                         </p>
                       )}
                       <p className="note-item-preview">
-                        {(note.content || '').replace(/<[^>]*>/g, '').slice(0, 60).replace(/\n/g, ' ') || 'Trống...'}
+                        {(note.content || '').replace(/<[^>]*>/g, '').slice(0, 60).replace(/\n/g, ' ') || t('notes.empty')}
                       </p>
                       <p className="note-item-date">{formatDate(note.updatedAt)}</p>
                     </div>
@@ -409,21 +412,21 @@ export default function NotesPage() {
                       <button
                         className={`note-action-btn ${note.isStarred ? 'starred' : ''}`}
                         onClick={(e) => handleStar(note, e)}
-                        title="Gắn sao"
+                        title={t('notes.star')}
                       >
                         <Star size={14} />
                       </button>
                       <button
                         className="note-action-btn"
                         onClick={e => startRename(note, e)}
-                        title="Đổi tên"
+                        title={t('notes.rename')}
                       >
                         <Pencil size={14} />
                       </button>
                       <button
                         className="note-action-btn danger"
                         onClick={(e) => handleDelete(note, e)}
-                        title="Xóa"
+                        title={t('fileCard.delete')}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -446,12 +449,12 @@ export default function NotesPage() {
                 className="note-title-input"
                 value={activeNote.title}
                 onChange={handleTitleChange}
-                placeholder="Tiêu đề ghi chú..."
+                placeholder={t('notes.titlePlaceholder')}
                 maxLength={120}
               />
               <div className="notes-editor-actions">
-                {saving && <span className="note-saving-badge">Đang lưu...</span>}
-                {!saving && <span className="note-saved-badge">✓ Đã lưu</span>}
+                {saving && <span className="note-saving-badge">{t('notes.saving')}</span>}
+                {!saving && <span className="note-saved-badge">{t('notes.saved')}</span>}
 
                 <div className="note-color-picker">
                   {NOTE_COLORS.map(c => (
@@ -465,13 +468,13 @@ export default function NotesPage() {
                   ))}
                 </div>
 
-                <button className="btn btn-secondary btn-sm" onClick={handleDownload} title="Tải về .txt">
-                  <Download size={15} /> Tải .txt
+                <button className="btn btn-secondary btn-sm" onClick={handleDownload} title={t('notes.download')}>
+                  <Download size={15} /> {t('notes.download')}
                 </button>
                 <button
                   className={`btn btn-sm ${activeNote.isStarred ? 'btn-starred' : 'btn-secondary'}`}
                   onClick={(e) => handleStar(activeNote, e)}
-                  title="Gắn sao"
+                  title={t('notes.star')}
                 >
                   <Star size={15} />
                 </button>
@@ -485,21 +488,21 @@ export default function NotesPage() {
                 <button
                   className={`note-tool-btn ${formatState.bold ? 'active' : ''}`}
                   onMouseDown={e => { e.preventDefault(); execFormat('bold'); }}
-                  title="In đậm (Ctrl+B)"
+                  title={t('notes.bold')}
                 >
                   <Bold size={15} />
                 </button>
                 <button
                   className={`note-tool-btn ${formatState.italic ? 'active' : ''}`}
                   onMouseDown={e => { e.preventDefault(); execFormat('italic'); }}
-                  title="In nghiêng (Ctrl+I)"
+                  title={t('notes.italic')}
                 >
                   <Italic size={15} />
                 </button>
                 <button
                   className={`note-tool-btn ${formatState.underline ? 'active' : ''}`}
                   onMouseDown={e => { e.preventDefault(); execFormat('underline'); }}
-                  title="Gạch chân (Ctrl+U)"
+                  title={t('notes.underline')}
                 >
                   <UnderlineIcon size={15} />
                 </button>
@@ -512,7 +515,7 @@ export default function NotesPage() {
                 <Type size={14} className="note-toolbar-label-icon" />
                 <ToolbarDropdown
                   options={FONT_FAMILIES}
-                  placeholder="Kiểu chữ"
+                  placeholder={t('notes.fontStyle')}
                   onChange={applyFontFamily}
                   fontPreview
                   width="120px"
@@ -525,7 +528,7 @@ export default function NotesPage() {
               <div className="note-toolbar-group">
                 <ToolbarDropdown
                   options={FONT_SIZES.map(s => ({ label: s, value: s }))}
-                  placeholder="Cỡ chữ"
+                  placeholder={t('notes.fontSize')}
                   onChange={applyFontSize}
                   width="84px"
                 />
@@ -538,21 +541,21 @@ export default function NotesPage() {
                 <button
                   className={`note-tool-btn ${formatState.align === 'left' ? 'active' : ''}`}
                   onMouseDown={e => { e.preventDefault(); execAlign('justifyLeft'); }}
-                  title="Căn trái"
+                  title={t('notes.alignLeft')}
                 >
                   <AlignLeft size={15} />
                 </button>
                 <button
                   className={`note-tool-btn ${formatState.align === 'center' ? 'active' : ''}`}
                   onMouseDown={e => { e.preventDefault(); execAlign('justifyCenter'); }}
-                  title="Căn giữa"
+                  title={t('notes.alignCenter')}
                 >
                   <AlignCenter size={15} />
                 </button>
                 <button
                   className={`note-tool-btn ${formatState.align === 'right' ? 'active' : ''}`}
                   onMouseDown={e => { e.preventDefault(); execAlign('justifyRight'); }}
-                  title="Căn phải"
+                  title={t('notes.alignRight')}
                 >
                   <AlignRight size={15} />
                 </button>
@@ -561,8 +564,8 @@ export default function NotesPage() {
 
             {/* Meta */}
             <div className="note-meta">
-              Cập nhật: {formatDate(activeNote.updatedAt)} &nbsp;·&nbsp;
-              {getCharCount()} ký tự
+              {t('notes.updatedAt')} {formatDate(activeNote.updatedAt)} &nbsp;·&nbsp;
+              {getCharCount()} {t('notes.characters')}
             </div>
 
             {/* Rich text editor area */}
@@ -575,17 +578,17 @@ export default function NotesPage() {
               onKeyUp={updateFormatState}
               onMouseUp={updateFormatState}
               style={{ '--note-accent': activeNote.color }}
-              data-placeholder="Bắt đầu viết ghi chú..."
+              data-placeholder={t('notes.placeholder')}
               spellCheck={false}
             />
           </>
         ) : (
           <div className="notes-editor-empty">
             <div className="notes-editor-empty-icon">📝</div>
-            <h2>Chọn hoặc tạo ghi chú</h2>
-            <p>Ghi chú được lưu trực tuyến và tự động đồng bộ</p>
+            <h2>{t('notes.emptyEditor')}</h2>
+            <p>{t('notes.emptyEditorDesc')}</p>
             <button className="btn btn-primary" onClick={handleCreate} id="notes-create-btn">
-              <Plus size={18} /> Tạo ghi chú mới
+              <Plus size={18} /> {t('notes.createNew')}
             </button>
           </div>
         )}

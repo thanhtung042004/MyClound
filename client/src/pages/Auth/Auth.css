@@ -578,3 +578,92 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* ===== FORGOT STEPS INDICATOR ===== */
+.forgot-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 4px;
+}
+
+.forgot-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.forgot-step span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.forgot-step p {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.3s;
+}
+
+.forgot-step.active span {
+  background: rgba(91, 141, 238, 0.2);
+  border-color: rgba(91, 141, 238, 0.5);
+  color: #5b8dee;
+}
+
+.forgot-step.active p {
+  color: #5b8dee;
+}
+
+.forgot-step.done span {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #10b981;
+}
+
+.forgot-step.done p {
+  color: #10b981;
+}
+
+.forgot-step-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 8px;
+  margin-bottom: 16px;
+  transition: background 0.3s;
+}
+
+.forgot-step-line.active {
+  background: rgba(91, 141, 238, 0.4);
+}
+
+/* Security question display box */
+.auth-security-question-display {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(91, 141, 238, 0.08);
+  border: 1px solid rgba(91, 141, 238, 0.2);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.83rem;
+  line-height: 1.4;
+}
+
+.auth-security-question-display svg {
+  flex-shrink: 0;
+  color: #5b8dee;
+  margin-top: 1px;
+}
+

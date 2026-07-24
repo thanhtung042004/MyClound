@@ -25,7 +25,6 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('myclound_token');
-      localStorage.removeItem('myclound_user');
       window.location.href = '/login';
     }
     return Promise.reject(error);

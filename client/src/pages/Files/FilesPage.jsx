@@ -6,19 +6,11 @@ import UploadModal from '../../components/Upload/UploadModal';
 import ShareModal from '../../components/Modal/ShareModal';
 import PreviewModal from '../../components/Modal/PreviewModal';
 import { Grid, List, FolderPlus, SortDesc, Search, Filter } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 import './FilesPage.css';
 
-const SORT_OPTIONS = [
-  { label: 'Mới nhất', value: '-createdAt' },
-  { label: 'Cũ nhất', value: 'createdAt' },
-  { label: 'Tên A-Z', value: 'name' },
-  { label: 'Tên Z-A', value: '-name' },
-  { label: 'Lớn nhất', value: '-size' },
-  { label: 'Nhỏ nhất', value: 'size' },
-];
-
-export default function FilesPage() {
+export default function FilesPage({ filterStarred = false }) {
   const [searchParams] = useSearchParams();
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -32,8 +24,19 @@ export default function FilesPage() {
   const [createFolderName, setCreateFolderName] = useState('');
   const [showCreateFolder, setShowCreateFolder] = useState(false);
 
+  const { t } = useLanguage();
+
   const typeFilter = searchParams.get('type') || '';
   const searchQuery = searchParams.get('search') || '';
+
+  const SORT_OPTIONS = [
+    { label: t('files.sort.newest'), value: '-createdAt' },
+    { label: t('files.sort.oldest'), value: 'createdAt' },
+    { label: t('files.sort.nameAZ'), value: 'name' },
+    { label: t('files.sort.nameZA'), value: '-name' },
+    { label: t('files.sort.largest'), value: '-size' },
+    { label: t('files.sort.smallest'), value: 'size' },
+  ];
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -47,29 +50,29 @@ export default function FilesPage() {
           sort,
         }),
       ];
-      if (!typeFilter && !searchQuery) {
+      if (!typeFilter && !searchQuery && !filterStarred) {
         requests.push(folderService.getFolders({ parent: currentFolder || '' }));
       }
       const [filesRes, foldersRes] = await Promise.all(requests);
       setFiles(filesRes.data.data);
       setFolders(foldersRes ? foldersRes.data.data : []);
     } catch {
-      toast.error('Không thể tải dữ liệu');
+      toast.error(t('toast.loadDataFail'));
     } finally {
       setLoading(false);
     }
-  }, [currentFolder, typeFilter, searchQuery, sort]);
+  }, [currentFolder, typeFilter, searchQuery, sort, t]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
   const handleDelete = async (file) => {
-    if (!confirm(`Xóa file "${file.name}"?`)) return;
+    if (!confirm(`${t('confirm.deleteFile')} "${file.name}"?`)) return;
     try {
       await fileService.deleteFile(file._id);
-      toast.success('Đã chuyển vào thùng rác');
+      toast.success(t('toast.trashSuccess'));
       loadData();
     } catch {
-      toast.error('Xóa thất bại');
+      toast.error(t('toast.trashFail'));
     }
   };
 
@@ -78,19 +81,19 @@ export default function FilesPage() {
       await fileService.updateFile(file._id, { isStarred: !file.isStarred });
       setFiles(prev => prev.map(f => f._id === file._id ? { ...f, isStarred: !f.isStarred } : f));
     } catch {
-      toast.error('Thao tác thất bại');
+      toast.error(t('toast.actionFail'));
     }
   };
 
   const handleRename = async (file) => {
-    const newName = prompt('Tên mới:', file.name);
+    const newName = prompt(t('prompt.rename'), file.name);
     if (!newName || newName === file.name) return;
     try {
       await fileService.updateFile(file._id, { name: newName });
       setFiles(prev => prev.map(f => f._id === file._id ? { ...f, name: newName } : f));
-      toast.success('Đã đổi tên');
+      toast.success(t('toast.renameSuccess'));
     } catch {
-      toast.error('Đổi tên thất bại');
+      toast.error(t('toast.renameFail'));
     }
   };
 
@@ -98,31 +101,34 @@ export default function FilesPage() {
     if (!createFolderName.trim()) return;
     try {
       await folderService.createFolder({ name: createFolderName, parent: currentFolder });
-      toast.success('Đã tạo thư mục');
+      toast.success(t('toast.folderCreateSuccess'));
       setCreateFolderName('');
       setShowCreateFolder(false);
       loadData();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Tạo thất bại');
+      toast.error(err.response?.data?.message || t('toast.folderCreateFail'));
     }
   };
 
   const handleDeleteFolder = async (folder) => {
-    if (!confirm(`Xóa thư mục "${folder.name}" và tất cả nội dung bên trong?`)) return;
+    if (!confirm(t('confirm.deleteFolder').replace('{name}', folder.name))) return;
     try {
       await folderService.deleteFolder(folder._id);
-      toast.success('Đã xóa thư mục');
+      toast.success(t('toast.folderDeleteSuccess'));
       loadData();
     } catch {
-      toast.error('Xóa thất bại');
+      toast.error(t('toast.folderDeleteFail'));
     }
   };
 
-  const pageTitle = typeFilter === 'image' ? 'Hình ảnh'
-    : typeFilter === 'video' ? 'Video'
-    : typeFilter === 'document' ? 'Tài liệu'
-    : searchQuery ? `Kết quả cho "${searchQuery}"`
-    : 'Tất cả file';
+  const displayedFiles = filterStarred ? files.filter(f => f.isStarred) : files;
+
+  const pageTitle = filterStarred ? t('files.starred')
+    : typeFilter === 'image' ? t('files.images')
+    : typeFilter === 'video' ? t('files.video')
+    : typeFilter === 'document' ? t('files.documents')
+    : searchQuery ? `${t('files.searchResult')} "${searchQuery}"`
+    : t('files.title');
 
   return (
     <div className="files-page page-content">
@@ -142,24 +148,24 @@ export default function FilesPage() {
             <button
               className={`btn btn-ghost btn-icon ${view === 'grid' ? 'active-view' : ''}`}
               onClick={() => setView('grid')}
-              data-tooltip="Lưới"
+              data-tooltip={t('files.tooltipGrid')}
             >
               <Grid size={18} />
             </button>
             <button
               className={`btn btn-ghost btn-icon ${view === 'list' ? 'active-view' : ''}`}
               onClick={() => setView('list')}
-              data-tooltip="Danh sách"
+              data-tooltip={t('files.tooltipList')}
             >
               <List size={18} />
             </button>
           </div>
 
           <button className="btn btn-secondary" onClick={() => setShowCreateFolder(true)} id="new-folder-btn">
-            <FolderPlus size={16} /> Thư mục mới
+            <FolderPlus size={16} /> {t('files.newFolder')}
           </button>
           <button className="btn btn-primary" onClick={() => setUploadOpen(true)} id="files-upload-btn">
-            Upload
+            {t('files.upload')}
           </button>
         </div>
       </div>
@@ -170,22 +176,22 @@ export default function FilesPage() {
           <input
             autoFocus
             className="form-input"
-            placeholder="Tên thư mục..."
+            placeholder={t('files.folderPlaceholder')}
             value={createFolderName}
             onChange={(e) => setCreateFolderName(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleCreateFolder(); if (e.key === 'Escape') setShowCreateFolder(false); }}
           />
-          <button className="btn btn-primary btn-sm" onClick={handleCreateFolder}>Tạo</button>
-          <button className="btn btn-secondary btn-sm" onClick={() => setShowCreateFolder(false)}>Hủy</button>
+          <button className="btn btn-primary btn-sm" onClick={handleCreateFolder}>{t('files.create')}</button>
+          <button className="btn btn-secondary btn-sm" onClick={() => setShowCreateFolder(false)}>{t('files.cancel')}</button>
         </div>
       )}
 
       {/* Breadcrumb */}
       {currentFolder && (
         <div className="breadcrumb">
-          <button className="breadcrumb-item" onClick={() => setCurrentFolder(null)}>Tất cả file</button>
+          <button className="breadcrumb-item" onClick={() => setCurrentFolder(null)}>{t('files.allFiles')}</button>
           <span className="breadcrumb-sep">›</span>
-          <span className="breadcrumb-item active">Thư mục hiện tại</span>
+          <span className="breadcrumb-item active">{t('files.currentFolder')}</span>
         </div>
       )}
 
@@ -201,22 +207,22 @@ export default function FilesPage() {
           {/* Folders */}
           {folders.length > 0 && (
             <div className="section">
-              <h2 className="section-title">Thư mục</h2>
+              <h2 className="section-title">{t('files.folders')}</h2>
               <div className="folder-grid">
                 {folders.map(folder => (
                   <div
                     key={folder._id}
                     className="folder-card glass-card"
                     onClick={() => setCurrentFolder(folder._id)}
-                    onContextMenu={(e) => { e.preventDefault(); }}
                   >
-                    <div className="folder-icon" style={{ color: folder.color }}>📁</div>
+                    <div className="folder-icon-wrap">📁</div>
                     <div className="folder-info">
                       <p className="folder-name">{folder.name}</p>
                     </div>
                     <button
                       className="btn btn-ghost btn-icon btn-sm folder-delete"
                       onClick={(e) => { e.stopPropagation(); handleDeleteFolder(folder); }}
+                      data-tooltip={t('files.cancel')}
                     >
                       ✕
                     </button>
@@ -230,17 +236,17 @@ export default function FilesPage() {
           {files.length === 0 && folders.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state-icon">📂</div>
-              <h3>Chưa có file nào</h3>
-              <p>Upload file đầu tiên hoặc tạo thư mục mới</p>
+              <h3>{t('files.emptyTitle')}</h3>
+              <p>{t('files.emptyDesc')}</p>
               <button className="btn btn-primary" onClick={() => setUploadOpen(true)}>
-                Upload ngay
+                {t('files.uploadNow')}
               </button>
             </div>
-          ) : files.length > 0 ? (
+          ) : displayedFiles.length > 0 ? (
             <div className="section">
-              {folders.length > 0 && <h2 className="section-title">File</h2>}
+              {folders.length > 0 && <h2 className="section-title">{t('files.files')}</h2>}
               <div className={view === 'grid' ? 'file-grid' : 'file-list'}>
-                {files.map(file => (
+                {displayedFiles.map(file => (
                   <FileCard
                     key={file._id}
                     file={file}

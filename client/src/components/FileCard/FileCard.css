@@ -1,3 +1,4 @@
+/* ── GRID: Card container ── */
 .file-card {
   display: flex;
   flex-direction: column;
@@ -9,16 +10,16 @@
 }
 
 .file-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md), var(--shadow-glow);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(108, 99, 255, 0.15);
 }
 
-/* Thumbnail */
+/* ── GRID: Thumbnail ── */
 .file-card-thumb {
   position: relative;
   aspect-ratio: 4/3;
   overflow: hidden;
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.02);
   cursor: pointer;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
@@ -27,23 +28,37 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .file-card:hover .file-thumb-img {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 
+/* Video overlay */
 .video-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.3);
-  color: white;
+  background: rgba(0,0,0,0.28);
 }
 
+.video-play-btn {
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(8px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* Icon placeholder for non-image/video */
 .file-icon-placeholder {
   width: 100%;
   height: 100%;
@@ -51,26 +66,40 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: rgba(255,255,255,0.03);
+  gap: 10px;
+  background: var(--type-bg, rgba(255,255,255,0.03));
+}
+
+.file-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--type-bg, rgba(255,255,255,0.06));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 
 .file-ext {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--type-color, var(--text-muted));
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
+/* Hover overlay */
 .file-card-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: var(--transition);
+  transition: opacity 0.22s ease;
+  border-radius: inherit;
 }
 
 .file-card:hover .file-card-overlay {
@@ -78,10 +107,11 @@
 }
 
 .overlay-btn {
-  width: 40px;
-  height: 40px;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.2);
+  width: 42px;
+  height: 42px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.22);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -89,6 +119,12 @@
   color: white;
   cursor: pointer;
   transition: var(--transition);
+  transform: scale(0.85);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.file-card:hover .overlay-btn {
+  transform: scale(1);
 }
 
 .overlay-btn:hover {
@@ -96,73 +132,83 @@
   border-color: var(--accent-purple);
 }
 
-.file-star-badge {
+/* Top badges */
+.file-card-badges {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-badge {
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.file-star-badge {
+  background: rgba(0,0,0,0.55);
 }
 
 .file-shared-indicator {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(108, 99, 255, 0.8);
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: rgba(108, 99, 255, 0.85);
   color: white;
 }
 
-/* Info */
+/* ── GRID: Footer ── */
+.file-card-footer {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px 10px;
+  gap: 4px;
+  min-height: 56px;
+}
+
 .file-card-info {
-  padding: 10px 12px 6px;
+  flex: 1;
+  min-width: 0;
 }
 
 .file-name {
-  font-size: 0.85rem;
+  font-size: 0.855rem;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-primary);
+  line-height: 1.3;
 }
 
 .file-meta {
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
   margin-top: 2px;
 }
 
-/* Actions */
+/* Actions (3-dot menu) */
 .file-card-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 2px 8px 8px;
-  opacity: 0;
-  transition: var(--transition);
-  overflow: visible;
+  flex-shrink: 0;
   position: relative;
-  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.18s ease;
 }
 
 .file-card:hover .file-card-actions {
   opacity: 1;
 }
 
-.file-menu-wrapper {
-  position: relative;
-  margin-left: auto;
+.file-menu-btn {
+  color: var(--text-muted);
+}
+
+.file-menu-btn:hover {
+  color: var(--text-primary);
 }
 
 .file-menu {
@@ -170,27 +216,28 @@
   right: 0;
   bottom: calc(100% + 4px);
   z-index: 200;
-  min-width: 160px;
+  min-width: 165px;
 }
 
-/* List View */
+/* ── LIST VIEW ── */
 .file-list-item {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-radius: var(--radius-md);
   transition: var(--transition);
 }
 
 .file-list-item:hover {
   transform: none;
-  background: var(--bg-card-hover);
+  background: var(--bg-card-hover, rgba(255,255,255,0.04));
+  box-shadow: none;
 }
 
 .file-list-thumb {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius-sm);
   overflow: hidden;
   flex-shrink: 0;
@@ -205,12 +252,20 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.file-list-item:hover .file-list-thumb img {
+  transform: scale(1.06);
 }
 
 .file-list-icon {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--radius-sm);
 }
 
 .file-list-info {
@@ -219,23 +274,48 @@
   cursor: pointer;
 }
 
+/* Type pill badge in list view */
+.file-type-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
 .file-shared-badge {
   font-size: 0.7rem;
   padding: 2px 8px;
-  background: rgba(108,99,255,0.15);
+  background: rgba(108,99,255,0.12);
   color: var(--accent-purple);
   border-radius: 99px;
-  border: 1px solid rgba(108,99,255,0.3);
+  border: 1px solid rgba(108,99,255,0.25);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .file-list-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex-shrink: 0;
+}
+
+.file-action-btn {
+  opacity: 0.55;
+  transition: opacity 0.15s, color 0.15s, background 0.15s !important;
+}
+
+.file-list-item:hover .file-action-btn {
+  opacity: 1;
 }
 
 .starred svg {
   color: var(--warning);
+}
+
+.file-menu-wrapper {
+  position: relative;
 }

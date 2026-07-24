@@ -43,12 +43,26 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
+  // Security question for password reset (no email service needed)
+  securityQuestion: {
+    type: String,
+    default: null,
+  },
+  securityAnswer: {
+    type: String,
+    default: null,
+    select: false, // never return in queries by default
+  },
 }, { timestamps: true });
 
-// Hash password before saving
+// Hash password and securityAnswer before saving
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) return;
-  this.password = await bcrypt.hash(this.password, 12);
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
+  if (this.isModified('securityAnswer') && this.securityAnswer) {
+    this.securityAnswer = await bcrypt.hash(this.securityAnswer.toLowerCase().trim(), 12);
+  }
 });
 
 // Compare password method
@@ -56,10 +70,17 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove password from JSON output
+// Compare security answer method
+userSchema.methods.compareSecurityAnswer = async function (candidateAnswer) {
+  if (!this.securityAnswer) return false;
+  return await bcrypt.compare(candidateAnswer.toLowerCase().trim(), this.securityAnswer);
+};
+
+// Remove sensitive fields from JSON output
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
+  delete user.securityAnswer;
   return user;
 };
 

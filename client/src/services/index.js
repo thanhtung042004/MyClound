@@ -6,7 +6,9 @@ export const authService = {
   getMe: () => api.get('/auth/me'),
   updateProfile: (data) => api.put('/auth/update-profile', data),
   changePassword: (data) => api.put('/auth/change-password', data),
+  getSecurityQuestion: (data) => api.post('/auth/get-security-question', data),
   resetPassword: (data) => api.post('/auth/reset-password', data),
+  updateSecurityQuestion: (data) => api.put('/auth/security-question', data),
 };
 
 export const fileService = {
@@ -46,4 +48,11 @@ export const noteService = {
   createNote: (data) => api.post('/notes', data),
   updateNote: (id, data) => api.put(`/notes/${id}`, data),
   deleteNote: (id) => api.delete(`/notes/${id}`),
+};
+
+export const linkService = {
+  getLinks: (params) => api.get('/links', { params }),
+  createLink: (data) => api.post('/links', data),
+  updateLink: (id, data) => api.put(`/links/${id}`, data),
+  deleteLink: (id) => api.delete(`/links/${id}`),
 };

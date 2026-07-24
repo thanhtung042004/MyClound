@@ -3,18 +3,20 @@ import { fileService } from '../../services';
 import FileCard from '../../components/FileCard/FileCard';
 import PreviewModal from '../../components/Modal/PreviewModal';
 import { Trash2, RefreshCcw } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 
 export default function TrashPage() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [previewFile, setPreviewFile] = useState(null);
+  const { t } = useLanguage();
 
   const load = async () => {
     try {
       const { data } = await fileService.getFiles({ trashed: true });
       setFiles(data.data);
-    } catch { toast.error('Không thể tải'); }
+    } catch { toast.error(t('toast.loadFail')); }
     finally { setLoading(false); }
   };
 
@@ -23,38 +25,38 @@ export default function TrashPage() {
   const handleRestore = async (file) => {
     try {
       await fileService.restoreFile(file._id);
-      toast.success('Đã khôi phục file');
+      toast.success(t('toast.restoreSuccess'));
       load();
-    } catch { toast.error('Khôi phục thất bại'); }
+    } catch { toast.error(t('toast.restoreFail')); }
   };
 
   const handlePermDelete = async (file) => {
-    if (!confirm(`Xóa vĩnh viễn "${file.name}"? Không thể hoàn tác!`)) return;
+    if (!confirm(t('confirm.permDelete').replace('{name}', file.name))) return;
     try {
       await fileService.deleteFile(file._id, true);
-      toast.success('Đã xóa vĩnh viễn');
+      toast.success(t('toast.permDeleteSuccess'));
       load();
-    } catch { toast.error('Xóa thất bại'); }
+    } catch { toast.error(t('toast.permDeleteFail')); }
   };
 
   const handleEmptyTrash = async () => {
-    if (!confirm(`Xóa vĩnh viễn tất cả ${files.length} file? Không thể hoàn tác!`)) return;
+    if (!confirm(t('confirm.emptyTrash').replace('{count}', files.length))) return;
     try {
       await Promise.all(files.map(f => fileService.deleteFile(f._id, true)));
-      toast.success('Đã dọn sạch thùng rác');
+      toast.success(t('toast.emptyTrashSuccess'));
       setFiles([]);
-    } catch { toast.error('Xảy ra lỗi'); }
+    } catch { toast.error(t('toast.emptyTrashFail')); }
   };
 
   return (
     <div className="page-content">
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
-          <Trash2 size={22} /> Thùng rác
+          <Trash2 size={22} /> {t('trash.title')}
         </h1>
         {files.length > 0 && (
           <button className="btn btn-danger btn-sm" onClick={handleEmptyTrash}>
-            Xóa tất cả
+            {t('trash.deleteAll')}
           </button>
         )}
       </div>
@@ -66,8 +68,8 @@ export default function TrashPage() {
       ) : files.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">🗑️</div>
-          <h3>Thùng rác trống</h3>
-          <p>Các file đã xóa sẽ xuất hiện ở đây</p>
+          <h3>{t('trash.emptyTitle')}</h3>
+          <p>{t('trash.emptyDesc')}</p>
         </div>
       ) : (
         <div className="file-list">
@@ -84,9 +86,9 @@ export default function TrashPage() {
               <button
                 className="btn btn-secondary btn-sm"
                 onClick={() => handleRestore(file)}
-                data-tooltip="Khôi phục"
+                data-tooltip={t('trash.restore')}
               >
-                <RefreshCcw size={14} /> Khôi phục
+                <RefreshCcw size={14} /> {t('trash.restore')}
               </button>
             </div>
           ))}

@@ -117,22 +117,85 @@ const changePassword = async (req, res) => {
   }
 };
 
-// POST /api/auth/reset-password (public)
+// PUT /api/auth/security-question (protected — update security question in settings)
+const updateSecurityQuestion = async (req, res) => {
+  try {
+    const { securityQuestion, securityAnswer } = req.body;
+
+    if (!securityQuestion || !securityAnswer) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp câu hỏi và câu trả lời bí mật.' });
+    }
+
+    const user = await User.findById(req.user._id);
+    user.securityQuestion = securityQuestion;
+    user.securityAnswer = securityAnswer; // will be hashed by pre-save hook
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Câu hỏi bí mật đã được cập nhật thành công.' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// POST /api/auth/get-security-question (public — step 1 of reset flow)
+const getSecurityQuestion = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Vui lòng nhập email.' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản với email này.' });
+    }
+
+    if (!user.securityQuestion) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tài khoản này chưa thiết lập câu hỏi bí mật. Vui lòng liên hệ hỗ trợ.',
+        noSecurityQuestion: true,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      securityQuestion: user.securityQuestion,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// POST /api/auth/reset-password (public — step 2: verify answer + change password)
 const resetPassword = async (req, res) => {
   try {
-    const { email, newPassword } = req.body;
+    const { email, securityAnswer, newPassword } = req.body;
 
-    if (!email || !newPassword) {
-      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp email và mật khẩu mới.' });
+    if (!email || !securityAnswer || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin.' });
     }
 
     if (newPassword.length < 6) {
       return res.status(400).json({ success: false, message: 'Mật khẩu phải có ít nhất 6 ký tự.' });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
+    const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password +securityAnswer');
     if (!user) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản với email này.' });
+    }
+
+    if (!user.securityAnswer) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tài khoản này chưa thiết lập câu hỏi bí mật.',
+      });
+    }
+
+    const isAnswerCorrect = await user.compareSecurityAnswer(securityAnswer);
+    if (!isAnswerCorrect) {
+      return res.status(401).json({ success: false, message: 'Câu trả lời bí mật không đúng.' });
     }
 
     user.password = newPassword;
@@ -144,4 +207,13 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe, updateProfile, changePassword, resetPassword };
+module.exports = {
+  register,
+  login,
+  getMe,
+  updateProfile,
+  changePassword,
+  updateSecurityQuestion,
+  getSecurityQuestion,
+  resetPassword,
+};
