@@ -210,3 +210,65 @@
   height: 62px;
   border-radius: var(--radius-md);
 }
+
+/* ===================================================
+   Light Theme (Xianxia) FilesPage Overrides
+   =================================================== */
+[data-theme="light"] .breadcrumb {
+  background: rgba(255, 255, 255, 0.60);
+  border: 1px solid rgba(74, 130, 190, 0.18);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="light"] .breadcrumb-item:hover {
+  color: #1d3557;
+}
+
+[data-theme="light"] .breadcrumb-item.active {
+  color: #1d3557;
+}
+
+[data-theme="light"] .view-toggle {
+  background: rgba(255, 255, 255, 0.60);
+  border: 1px solid rgba(74, 130, 190, 0.18);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="light"] .active-view {
+  background: rgba(74, 130, 190, 0.15) !important;
+  color: #2c6fad !important;
+}
+
+[data-theme="light"] .folder-card {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 2px 12px rgba(44, 74, 110, 0.08);
+}
+
+[data-theme="light"] .folder-card:hover {
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 6px 24px rgba(44, 74, 110, 0.14);
+  border-color: rgba(74, 130, 190, 0.30);
+}
+
+[data-theme="light"] .folder-icon-wrap {
+  background: rgba(200, 168, 75, 0.15);
+}
+
+[data-theme="light"] .folder-card:hover .folder-icon-wrap {
+  background: rgba(200, 168, 75, 0.28);
+}
+
+[data-theme="light"] .create-folder-bar {
+  background: rgba(255, 255, 255, 0.60);
+  border: 1px solid rgba(74, 130, 190, 0.18);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="light"] .files-title {
+  background: linear-gradient(135deg, #1d3557, #2c6fad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

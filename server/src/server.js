@@ -60,7 +60,11 @@ app.options('*', cors(corsOptions));
 // Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(morgan('dev'));
+// Chỉ log request khi có lỗi (status >= 400), bỏ qua các request thành công
+app.use(morgan('dev', {
+  skip: (req, res) => res.statusCode < 400,
+}));
+
 
 // Routes
 app.get('/', (req, res) => {

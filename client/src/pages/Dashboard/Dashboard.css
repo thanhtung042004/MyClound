@@ -488,3 +488,124 @@
     flex-wrap: wrap;
   }
 }
+
+/* ===================================================
+   Light Theme (Xianxia) Dashboard Overrides
+   =================================================== */
+
+/* Misty mountain background layer (shown in light mode) */
+[data-theme="light"] .main-content {
+  background:
+    radial-gradient(ellipse 80% 50% at 70% 90%, rgba(168, 210, 238, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 10% 60%, rgba(200, 225, 248, 0.28) 0%, transparent 60%);
+}
+
+/* Welcome section */
+[data-theme="light"] .dashboard-title {
+  background: linear-gradient(135deg, #1d3557, #2c6fad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .dashboard-subtitle {
+  color: #4a6fa5;
+}
+
+/* Stat cards – frosted porcelain */
+[data-theme="light"] .stat-card {
+  background: rgba(255, 255, 255, 0.58) !important;
+  border: 1px solid rgba(255, 255, 255, 0.80);
+  box-shadow: 0 4px 20px rgba(44, 74, 110, 0.09), inset 0 1px 0 rgba(255,255,255,0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] .stat-card:hover {
+  background: rgba(255, 255, 255, 0.78) !important;
+  box-shadow: 0 8px 32px rgba(44, 74, 110, 0.14), inset 0 1px 0 rgba(255,255,255,0.95);
+  transform: translateY(-3px);
+}
+
+[data-theme="light"] .stat-value {
+  color: #1d3557;
+}
+
+[data-theme="light"] .stat-label {
+  color: #4a6fa5;
+}
+
+/* Storage card */
+[data-theme="light"] .storage-card {
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.80);
+}
+
+[data-theme="light"] .donut-track {
+  stroke: rgba(74, 130, 190, 0.15);
+}
+
+/* Recent files card */
+[data-theme="light"] .recent-card {
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.80);
+}
+
+[data-theme="light"] .recent-file-item:hover {
+  background: rgba(74, 130, 190, 0.08);
+}
+
+[data-theme="light"] .recent-view-all {
+  color: #2c6fad;
+}
+
+[data-theme="light"] .recent-view-all:hover {
+  background: rgba(74, 130, 190, 0.10);
+}
+
+/* Quick action cards */
+[data-theme="light"] .quick-action-card {
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.80);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 4px 16px rgba(44, 74, 110, 0.08);
+}
+
+[data-theme="light"] .quick-action-card:hover {
+  background: rgba(255, 255, 255, 0.80);
+  box-shadow: 0 8px 28px rgba(44, 74, 110, 0.14);
+  border-color: rgba(74, 130, 190, 0.30);
+}
+
+[data-theme="light"] .quick-action-label {
+  color: #1d3557;
+}
+
+[data-theme="light"] .quick-action-desc {
+  color: #4a6fa5;
+}
+
+/* Section header icons */
+[data-theme="light"] .section-header-icon {
+  color: #4a82be;
+}
+
+/* Tip card */
+[data-theme="light"] .dashboard-tip {
+  background: rgba(74, 130, 190, 0.08);
+  border: 1px solid rgba(74, 130, 190, 0.20);
+}
+
+[data-theme="light"] .tip-icon {
+  background: linear-gradient(135deg, #4a82be, #4a9ebe);
+}
+
+[data-theme="light"] .storage-total {
+  border-top: 1px solid rgba(74, 130, 190, 0.15);
+}

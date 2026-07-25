@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { authService } from '../../services';
+import api from '../../services/api';
 import { User, Lock, Camera, Palette, Sun, Moon, Languages, ChevronDown, ShieldCheck, HelpCircle } from 'lucide-react';
 import { useLanguage, LANGUAGES } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
@@ -17,6 +18,22 @@ export default function SettingsPage() {
   const [confirmPwd, setConfirmPwd] = useState('');
   const [saving, setSaving] = useState(false);
   const [changingPwd, setChangingPwd] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const avatarInputRef = useRef(null);
+  const langWrapRef = useRef(null);
+
+  // Close lang dropdown on outside click
+  useEffect(() => {
+    if (!langOpen) return;
+    const handleOutside = (e) => {
+      if (langWrapRef.current && !langWrapRef.current.contains(e.target)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [langOpen]);
 
   // Security question state
   const [securityQuestion, setSecurityQuestion] = useState(user?.securityQuestion || '');
@@ -44,6 +61,42 @@ export default function SettingsPage() {
       toast.error(t('toast.profileUpdateFail'));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    avatarInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type and size
+    if (!file.type.startsWith('image/')) {
+      toast.error('Chỉ chấp nhận file ảnh!');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Ảnh không được vượt quá 5MB!');
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const { data } = await api.put('/auth/update-profile', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      updateUser(data.user);
+      toast.success('Ảnh đại diện đã được cập nhật!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Không thể cập nhật ảnh đại diện.');
+    } finally {
+      setUploadingAvatar(false);
+      // Reset input so same file can be re-selected
+      e.target.value = '';
     }
   };
 
@@ -95,19 +148,36 @@ export default function SettingsPage() {
 
           {/* Avatar */}
           <div className="avatar-section">
-            <div className="settings-avatar">
+            <div
+              className={`settings-avatar ${uploadingAvatar ? 'avatar-uploading' : ''}`}
+              onClick={handleAvatarClick}
+              title="Nhấn để thay ảnh đại diện"
+            >
               {user?.avatar ? (
                 <img src={user.avatar} alt={user.name} />
               ) : (
                 <span>{user?.name?.[0]?.toUpperCase()}</span>
               )}
               <div className="avatar-overlay">
-                <Camera size={16} />
+                {uploadingAvatar ? (
+                  <div className="spinner" style={{ width: 20, height: 20 }} />
+                ) : (
+                  <Camera size={16} />
+                )}
               </div>
             </div>
+            {/* Hidden file input */}
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleAvatarChange}
+            />
             <div>
               <p className="settings-name">{user?.name}</p>
               <p className="settings-email">{user?.email}</p>
+              <p className="avatar-hint">Nhấn vào ảnh để thay đổi</p>
             </div>
           </div>
 
@@ -305,23 +375,46 @@ export default function SettingsPage() {
               <Languages size={16} />
               <span>{t('settings.language')}</span>
             </div>
-            <div className="lang-select-wrap">
-              <span className="lang-select-flag">
-                {LANGUAGES.find(l => l.code === language)?.flag}
-              </span>
-              <select
+            <div className="lang-custom-wrap" ref={langWrapRef}>
+              {/* Trigger button */}
+              <button
+                type="button"
+                className="lang-custom-trigger"
+                onClick={() => setLangOpen(o => !o)}
                 id="language-select"
-                className="lang-select"
-                value={language}
-                onChange={e => setLanguage(e.target.value)}
               >
-                {LANGUAGES.map(lang => (
-                  <option key={lang.code} value={lang.code}>
-                    {lang.flag} {lang.nativeLabel} — {lang.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={15} className="lang-select-chevron" />
+                <img
+                  src={`https://flagcdn.com/w40/${LANGUAGES.find(l => l.code === language)?.flagImg}.png`}
+                  alt={LANGUAGES.find(l => l.code === language)?.nativeLabel}
+                  className="lang-flag-img"
+                />
+                <span className="lang-trigger-label">
+                  {LANGUAGES.find(l => l.code === language)?.nativeLabel}
+                </span>
+                <ChevronDown size={14} className={`lang-trigger-chevron ${langOpen ? 'open' : ''}`} />
+              </button>
+
+              {/* Dropdown panel */}
+              {langOpen && (
+                <div className="lang-dropdown-panel">
+                  {LANGUAGES.map(lang => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      className={`lang-option ${language === lang.code ? 'active' : ''}`}
+                      onClick={() => { setLanguage(lang.code); setLangOpen(false); }}
+                    >
+                      <img
+                        src={`https://flagcdn.com/w40/${lang.flagImg}.png`}
+                        alt={lang.nativeLabel}
+                        className="lang-flag-img"
+                      />
+                      <span className="lang-option-native">{lang.nativeLabel}</span>
+                      <span className="lang-option-label">{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

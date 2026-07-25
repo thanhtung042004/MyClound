@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap');
 
 /* ===== CSS Variables ===== */
 :root {
@@ -53,53 +54,115 @@
   color-scheme: dark;
 }
 
-/* ===== Light Theme ===== */
+/* ===== Light Theme – Xianxia (仙侠) Celestial Style ===== */
 [data-theme="light"] {
-  --bg-primary: #f0f2f8;
-  --bg-secondary: #e4e8f5;
-  --bg-card: rgba(255, 255, 255, 0.9);
-  --bg-card-hover: rgba(255, 255, 255, 1);
-  --bg-input: rgba(0, 0, 0, 0.05);
-  --bg-sidebar: #ffffff;
+  /* --- Palette --- */
+  --xian-sky:       #c8dff5;   /* misty sky blue */
+  --xian-cloud:     #e8f2fb;   /* cloud white-blue */
+  --xian-mist:      #d6eaf8;   /* distant mountain mist */
+  --xian-ink:       #2c4a6e;   /* deep ink blue */
+  --xian-teal:      #4a9ebe;   /* celestial teal */
+  --xian-gold:      #c8a84b;   /* immortal gold */
+  --xian-jade:      #5aab91;   /* jade green */
 
-  --text-primary: #1a1a2e;
-  --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
+  --bg-primary:     #ddeaf6;   /* soft sky background */
+  --bg-secondary:   #c8d9ed;
+  --bg-card:        rgba(255, 255, 255, 0.62);
+  --bg-card-hover:  rgba(255, 255, 255, 0.82);
+  --bg-input:       rgba(255, 255, 255, 0.55);
+  --bg-sidebar:     rgba(232, 242, 251, 0.92);
 
-  --border: rgba(0, 0, 0, 0.1);
-  --border-hover: rgba(108, 99, 255, 0.5);
+  /* --- Accent overrides --- */
+  --accent-purple:          #4a82be;
+  --accent-teal:            #4a9ebe;
+  --accent-gradient:        linear-gradient(135deg, #4a82be, #4a9ebe);
+  --accent-gradient-hover:  linear-gradient(135deg, #5a92ce, #5aaecc);
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.16);
-  --shadow-glow: 0 0 30px rgba(108, 99, 255, 0.12);
+  /* --- Text --- */
+  --text-primary:   #1d3557;
+  --text-secondary: #4a6fa5;
+  --text-muted:     #8aabcc;
 
-  --header-bg: rgba(255, 255, 255, 0.92);
-  --bg-modal: #ffffff;
-  --bg-context-menu: #ffffff;
+  /* --- Borders --- */
+  --border:         rgba(74, 130, 190, 0.18);
+  --border-hover:   rgba(74, 130, 190, 0.5);
 
-  /* Switch native UI back to light */
+  /* --- Shadows --- */
+  --shadow-sm:   0 2px 12px rgba(44, 74, 110, 0.10);
+  --shadow-md:   0 6px 24px rgba(44, 74, 110, 0.14);
+  --shadow-lg:   0 12px 48px rgba(44, 74, 110, 0.18);
+  --shadow-glow: 0 0 32px rgba(74, 130, 190, 0.20);
+
+  /* --- Surfaces --- */
+  --header-bg:        rgba(232, 242, 251, 0.88);
+  --bg-modal:         rgba(240, 248, 255, 0.97);
+  --bg-context-menu:  rgba(240, 248, 255, 0.97);
+
   color-scheme: light;
 }
 
+/* Body background – misty mountain gradient */
 [data-theme="light"] body {
-  background-color: var(--bg-primary);
+  background: linear-gradient(160deg, #c5d9f0 0%, #ddeaf6 40%, #e8f2fb 70%, #d0e5f5 100%);
+  background-attachment: fixed;
   color: var(--text-primary);
 }
 
+/* Celestial ambient orbs */
+[data-theme="light"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 15%, rgba(200, 225, 245, 0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(180, 215, 240, 0.40) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 55% 45%, rgba(214, 234, 248, 0.30) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-theme="light"] .app-layout {
+  position: relative;
+  z-index: 1;
+}
+
+/* Glass card – frosted porcelain */
 [data-theme="light"] .glass-card {
-  background: var(--bg-card);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.60);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 4px 24px rgba(44, 74, 110, 0.10), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+[data-theme="light"] .glass-card:hover {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(74, 130, 190, 0.35);
+  box-shadow: 0 8px 32px rgba(44, 74, 110, 0.16), inset 0 1px 0 rgba(255,255,255,0.9);
+  transform: translateY(-2px);
+}
+
+/* Scrollbar celestial teal */
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(74, 130, 190, 0.35);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 130, 190, 0.55);
 }
 
 [data-theme="light"] .context-menu {
-  background: #ffffff;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  background: rgba(240, 248, 255, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(74, 130, 190, 0.2);
+  box-shadow: 0 12px 40px rgba(44, 74, 110, 0.20);
 }
 
 [data-theme="light"] .modal {
-  background: #f8f9ff;
+  background: rgba(240, 248, 255, 0.97);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(74, 130, 190, 0.2);
 }
 
 /* Ẩn background ảnh tối khi dùng light theme */
@@ -140,6 +203,20 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(108, 99, 255, 0.4); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(108, 99, 255, 0.6); }
+
+/* ===== Floating particle animation for light theme ===== */
+@keyframes floatCloud {
+  0%   { transform: translateX(0) translateY(0); opacity: 0.4; }
+  50%  { transform: translateX(12px) translateY(-8px); opacity: 0.7; }
+  100% { transform: translateX(0) translateY(0); opacity: 0.4; }
+}
+
+@keyframes driftBird {
+  0%   { transform: translateX(-10px) translateY(0) scaleX(1); opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateX(calc(100vw + 20px)) translateY(-30px) scaleX(1); opacity: 0; }
+}
 
 /* ===== Layout ===== */
 .app-layout {
@@ -614,3 +691,141 @@ select.form-input {
     gap: 12px;
   }
 }
+
+/* =====================================================
+   Light Theme (Xianxia) – Global Element Overrides
+   ===================================================== */
+
+/* Form inputs */
+[data-theme="light"] .form-input {
+  background: rgba(255, 255, 255, 0.70);
+  border: 1px solid rgba(74, 130, 190, 0.22);
+  color: #1d3557;
+  backdrop-filter: blur(8px);
+}
+[data-theme="light"] .form-input:focus {
+  border-color: rgba(74, 130, 190, 0.60);
+  background: rgba(255, 255, 255, 0.90);
+  box-shadow: 0 0 0 3px rgba(74, 130, 190, 0.15);
+}
+[data-theme="light"] .form-input::placeholder {
+  color: #8aabcc;
+}
+
+/* Primary button */
+[data-theme="light"] .btn-primary {
+  background: linear-gradient(135deg, #4a82be, #4a9ebe);
+  box-shadow: 0 4px 16px rgba(74, 130, 190, 0.35);
+}
+[data-theme="light"] .btn-primary:hover {
+  background: linear-gradient(135deg, #5a92ce, #5aaecc);
+  box-shadow: 0 6px 22px rgba(74, 130, 190, 0.45);
+}
+
+/* Secondary button */
+[data-theme="light"] .btn-secondary {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(74, 130, 190, 0.22);
+  color: #1d3557;
+  backdrop-filter: blur(8px);
+}
+[data-theme="light"] .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(74, 130, 190, 0.40);
+}
+
+/* Ghost button */
+[data-theme="light"] .btn-ghost {
+  color: #4a6fa5;
+}
+[data-theme="light"] .btn-ghost:hover {
+  background: rgba(74, 130, 190, 0.10);
+  color: #1d3557;
+}
+
+/* Modal overlay */
+[data-theme="light"] .modal-overlay {
+  background: rgba(29, 53, 87, 0.40);
+  backdrop-filter: blur(8px);
+}
+
+/* Badge */
+[data-theme="light"] .badge-purple {
+  background: rgba(74, 130, 190, 0.15);
+  color: #2c6fad;
+  border: 1px solid rgba(74, 130, 190, 0.28);
+}
+
+/* Gradient text */
+[data-theme="light"] .gradient-text {
+  background: linear-gradient(135deg, #1d3557, #2c6fad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Progress bar */
+[data-theme="light"] .progress-bar {
+  background: rgba(74, 130, 190, 0.14);
+}
+[data-theme="light"] .progress-fill {
+  background: linear-gradient(135deg, #4a82be, #4a9ebe);
+}
+
+/* Spinner */
+[data-theme="light"] .spinner {
+  border: 2px solid rgba(74, 130, 190, 0.25);
+  border-top-color: #4a82be;
+}
+
+/* Context menu items */
+[data-theme="light"] .context-menu-item {
+  color: #4a6fa5;
+}
+[data-theme="light"] .context-menu-item:hover {
+  background: rgba(74, 130, 190, 0.10);
+  color: #1d3557;
+}
+
+/* Empty state */
+[data-theme="light"] .empty-state {
+  color: #4a6fa5;
+}
+[data-theme="light"] .empty-state h3 {
+  color: #1d3557;
+}
+[data-theme="light"] .empty-state p {
+  color: #8aabcc;
+}
+
+/* Tooltip */
+[data-theme="light"] [data-tooltip]::after {
+  background: rgba(29, 53, 87, 0.90);
+}
+
+/* Skeleton loader */
+[data-theme="light"] .skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.45) 25%,
+    rgba(255,255,255,0.70) 50%,
+    rgba(255,255,255,0.45) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Divider */
+[data-theme="light"] .divider {
+  background: rgba(74, 130, 190, 0.15);
+}
+
+/* Scrollbar for main content */
+[data-theme="light"] .main-content {
+  scrollbar-color: rgba(74, 130, 190, 0.35) transparent;
+}
+[data-theme="light"] .main-content::-webkit-scrollbar-thumb {
+  background: rgba(74, 130, 190, 0.35);
+}
+[data-theme="light"] .main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 130, 190, 0.55);
+}
+

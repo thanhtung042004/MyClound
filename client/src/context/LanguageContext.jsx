@@ -2,14 +2,8 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import translations from './translations';
 
 export const LANGUAGES = [
-  { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳', nativeLabel: 'Tiếng Việt' },
-  { code: 'en', label: 'English',    flag: '🇺🇸', nativeLabel: 'English' },
-  { code: 'zh', label: 'Tiếng Trung', flag: '🇨🇳', nativeLabel: '中文' },
-  { code: 'ja', label: 'Tiếng Nhật', flag: '🇯🇵', nativeLabel: '日本語' },
-  { code: 'ko', label: 'Tiếng Hàn',  flag: '🇰🇷', nativeLabel: '한국어' },
-  { code: 'fr', label: 'Tiếng Pháp', flag: '🇫🇷', nativeLabel: 'Français' },
-  { code: 'de', label: 'Tiếng Đức',  flag: '🇩🇪', nativeLabel: 'Deutsch' },
-  { code: 'es', label: 'Tiếng Tây Ban Nha', flag: '🇪🇸', nativeLabel: 'Español' },
+  { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳', flagImg: 'vn', nativeLabel: 'Tiếng Việt' },
+  { code: 'en', label: 'English',    flag: '🇺🇸', flagImg: 'us', nativeLabel: 'English' },
 ];
 
 const LanguageContext = createContext(null);

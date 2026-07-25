@@ -75,7 +75,11 @@ export default function Header({ onSearch, onUpload, onCreateFolder }) {
       <div className="header-actions">
         {/* Language badge */}
         <span className="header-lang-badge" title={currentLang.nativeLabel}>
-          {currentLang.flag}
+          <img
+            src={`https://flagcdn.com/w40/${currentLang.flagImg}.png`}
+            alt={currentLang.nativeLabel}
+            className="flag-img"
+          />
         </span>
 
         {/* New Folder */}
