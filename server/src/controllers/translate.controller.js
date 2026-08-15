@@ -1,6 +1,6 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 /**
  * Helper: Convert buffer to Gemini inline data part
@@ -29,9 +29,7 @@ const translateImage = async (req, res) => {
       return res.status(500).json({ success: false, message: 'GEMINI_API_KEY chưa được cấu hình.' });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-    const imagePart = bufferToGenerativePart(req.file.buffer, req.file.mimetype);
+    const imageBase64 = req.file.buffer.toString('base64');
 
     const prompt = `Bạn là một chuyên gia dịch thuật. Hãy phân tích hình ảnh này và thực hiện các bước sau:
 
@@ -51,9 +49,18 @@ Trả lời theo đúng định dạng JSON sau (không thêm gì khác):
 
 Nếu ảnh không chứa văn bản, đặt hasText = false, originalText = "", translatedText = "" và mô tả hình ảnh.`;
 
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = await result.response;
-    const text = response.text();
+    const result = await genAI.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        {
+          parts: [
+            { text: prompt },
+            { inlineData: { mimeType: req.file.mimetype, data: imageBase64 } },
+          ],
+        },
+      ],
+    });
+    const text = result.text;
 
     // Parse JSON from Gemini response (strip markdown code fences if any)
     let cleaned = text.trim();
@@ -115,9 +122,7 @@ const translateVideo = async (req, res) => {
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-    const videoPart = bufferToGenerativePart(req.file.buffer, req.file.mimetype);
+    const videoBase64 = req.file.buffer.toString('base64');
 
     const prompt = `Bạn là một chuyên gia phân tích và dịch thuật đa phương tiện. Hãy phân tích video này và thực hiện:
 
@@ -138,9 +143,18 @@ Trả lời theo đúng định dạng JSON sau (không thêm gì khác):
   "translatedDescription": "mô tả bằng tiếng Việt"
 }`;
 
-    const result = await model.generateContent([prompt, videoPart]);
-    const response = await result.response;
-    const text = response.text();
+    const result = await genAI.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        {
+          parts: [
+            { text: prompt },
+            { inlineData: { mimeType: req.file.mimetype, data: videoBase64 } },
+          ],
+        },
+      ],
+    });
+    const text = result.text;
 
     let cleaned = text.trim();
     if (cleaned.startsWith('```')) {
