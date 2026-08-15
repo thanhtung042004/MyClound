@@ -11,6 +11,7 @@ const folderRoutes = require('./routes/folder.routes');
 const downloadRoutes = require('./routes/download.routes');
 const noteRoutes = require('./routes/note.routes');
 const linkRoutes = require('./routes/link.routes');
+const translateRoutes = require('./routes/translate.routes');
 
 const app = express();
 
@@ -58,8 +59,8 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 // Middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Chỉ log request khi có lỗi (status >= 400), bỏ qua các request thành công
 app.use(morgan('dev', {
   skip: (req, res) => res.statusCode < 400,
@@ -80,6 +81,7 @@ app.use('/api/folders', folderRoutes);
 app.use('/api/download', downloadRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/links', linkRoutes);
+app.use('/api/translate', translateRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

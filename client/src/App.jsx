@@ -14,6 +14,7 @@ import SettingsPage from './pages/Settings/SettingsPage';
 import NotesPage from './pages/Notes/NotesPage';
 import DownloadPage from './pages/Download/DownloadPage';
 import LinksPage from './pages/Links/LinksPage';
+import TranslatePage from './pages/Translate/TranslatePage';
 import './index.css';
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
               <Route path="/notes" element={<NotesPage />} />
               <Route path="/download" element={<DownloadPage />} />
               <Route path="/links" element={<LinksPage />} />
+              <Route path="/translate" element={<TranslatePage />} />
             </Route>
 
             {/* Default */}

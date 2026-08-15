@@ -4,7 +4,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { formatBytes, getStoragePercent } from '../../utils/helpers';
 import {
   LayoutDashboard, FolderOpen, NotebookPen, LinkIcon,
-  Star, Trash2, Share2, Settings, LogOut, HardDrive, Bookmark
+  Star, Trash2, Share2, Settings, LogOut, HardDrive, Bookmark, Languages
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -20,6 +20,7 @@ export default function Sidebar() {
     { to: '/notes', icon: NotebookPen, label: t('nav.notes') },
     { to: '/links', icon: Bookmark, label: t('nav.links') },
     { to: '/download', icon: LinkIcon, label: t('nav.download') },
+    { to: '/translate', icon: Languages, label: t('nav.translate') },
   ];
 
   const bottomItems = [
