@@ -11,7 +11,7 @@ const {
   resetPassword,
 } = require('../controllers/auth.controller');
 const { protect } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { upload, processUpload } = require('../middleware/upload');
 
 // Public routes
 router.post('/register', register);
@@ -21,7 +21,7 @@ router.post('/reset-password', resetPassword);              // Step 2: verify an
 
 // Protected routes
 router.get('/me', protect, getMe);
-router.put('/update-profile', protect, upload.single('avatar'), updateProfile);
+router.put('/update-profile', protect, upload.single('avatar'), processUpload, updateProfile);
 router.put('/change-password', protect, changePassword);
 router.put('/security-question', protect, updateSecurityQuestion); // Settings page
 

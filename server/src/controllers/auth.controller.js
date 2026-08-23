@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const cloudinary = require('../config/cloudinary');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -64,13 +65,9 @@ const login = async (req, res) => {
 };
 
 // GET /api/auth/me
+// req.user đã được load sẵn trong middleware (lean object) — không cần query DB lại
 const getMe = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id);
-    res.status(200).json({ success: true, user });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  res.status(200).json({ success: true, user: req.user });
 };
 
 // PUT /api/auth/update-profile
@@ -82,8 +79,7 @@ const updateProfile = async (req, res) => {
 
     // Handle avatar upload
     if (req.file) {
-      const cloudinary = require('../config/cloudinary');
-      // Delete old avatar
+      // Delete old avatar if exists
       if (req.user.avatarPublicId) {
         await cloudinary.uploader.destroy(req.user.avatarPublicId);
       }

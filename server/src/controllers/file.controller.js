@@ -15,8 +15,9 @@ const getFiles = async (req, res) => {
 
     // Search logic
     if (search && search.trim()) {
-      query.name = { $regex: search.trim(), $options: 'i' };
-      // If a specific folder ID is provided, search inside that folder; otherwise search all folders
+      // Dùng $text index thay vì $regex — nhanh hơn đáng kể với dữ liệu lớn
+      query.$text = { $search: search.trim() };
+      // Nếu có folder cụ thể thì search trong folder đó
       if (folder && folder !== 'null' && folder !== '') {
         query.folder = folder;
       }
@@ -43,23 +44,29 @@ const getFiles = async (req, res) => {
 
     if (starred === 'true') query.isStarred = true;
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-    const files = await File.find(query)
-      .sort(sort)
-      .skip(skip)
-      .limit(parseInt(limit))
-      .populate('folder', 'name');
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
 
-    const total = await File.countDocuments(query);
+    // Chạy song song count và find — tránh query tuần tự
+    const [files, total] = await Promise.all([
+      File.find(query)
+        .sort(sort)
+        .skip(skip)
+        .limit(limitNum)
+        .populate('folder', 'name')
+        .lean(), // lean() trả về plain objects — nhanh hơn Mongoose documents
+      File.countDocuments(query),
+    ]);
 
     res.status(200).json({
       success: true,
       data: files,
       pagination: {
         total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(total / parseInt(limit)),
+        page: pageNum,
+        limit: limitNum,
+        pages: Math.ceil(total / limitNum),
       },
     });
   } catch (error) {
@@ -75,10 +82,10 @@ const uploadFiles = async (req, res) => {
     }
 
     const { folder = null } = req.body;
-    const savedFiles = [];
     let totalSize = 0;
 
-    for (const file of req.files) {
+    // Chuẩn bị tất cả documents để batch insert (insertMany thay vì N lần create)
+    const fileDocs = req.files.map((file) => {
       const resourceType = file.mimetype.startsWith('image/') ? 'image'
         : file.mimetype.startsWith('video/') ? 'video'
         : 'raw';
@@ -88,7 +95,9 @@ const uploadFiles = async (req, res) => {
       // Fix: multer may receive filename as Latin-1, decode back to UTF-8
       const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
 
-      const newFile = await File.create({
+      totalSize += file.size;
+
+      return {
         name: originalName.replace(/\.[^.]+$/, ''),
         originalName: originalName,
         owner: req.user._id,
@@ -103,13 +112,13 @@ const uploadFiles = async (req, res) => {
         size: file.size,
         width: file.width,
         height: file.height,
-      });
+      };
+    });
 
-      savedFiles.push(newFile);
-      totalSize += file.size;
-    }
+    // Batch insert — 1 DB roundtrip thay vì N roundtrips
+    const savedFiles = await File.insertMany(fileDocs, { ordered: false });
 
-    // Update user storage
+    // Update user storage một lần
     await User.findByIdAndUpdate(req.user._id, {
       $inc: { storageUsed: totalSize },
     });
@@ -249,7 +258,8 @@ const revokeShare = async (req, res) => {
 const getSharedFile = async (req, res) => {
   try {
     const file = await File.findOne({ shareToken: req.params.token, isShared: true })
-      .populate('owner', 'name avatar');
+      .populate('owner', 'name avatar')
+      .lean();
 
     if (!file) {
       return res.status(404).json({ success: false, message: 'Shared link not found or expired.' });
@@ -285,41 +295,52 @@ const restoreFile = async (req, res) => {
 };
 
 // GET /api/files/stats — user storage stats
+// Tối ưu: gộp 5 queries riêng lẻ → 1 aggregate pipeline duy nhất
 const getStats = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const [imageStat, videoStat, docStat, totalCount] = await Promise.all([
+    // 1 aggregate pipeline thay vì 4 queries riêng lẻ
+    const [aggregateResult, recentFiles] = await Promise.all([
       File.aggregate([
-        { $match: { owner: userId, resourceType: 'image', isTrashed: false } },
-        { $group: { _id: null, size: { $sum: '$size' }, count: { $sum: 1 } } },
+        {
+          $match: {
+            owner: userId,
+            isTrashed: false,
+          },
+        },
+        {
+          $group: {
+            _id: '$resourceType',
+            size: { $sum: '$size' },
+            count: { $sum: 1 },
+          },
+        },
       ]),
-      File.aggregate([
-        { $match: { owner: userId, resourceType: 'video', isTrashed: false } },
-        { $group: { _id: null, size: { $sum: '$size' }, count: { $sum: 1 } } },
-      ]),
-      File.aggregate([
-        { $match: { owner: userId, resourceType: 'raw', isTrashed: false } },
-        { $group: { _id: null, size: { $sum: '$size' }, count: { $sum: 1 } } },
-      ]),
-      File.countDocuments({ owner: userId, isTrashed: false }),
+      File.find({ owner: userId, isTrashed: false })
+        .sort('-createdAt')
+        .limit(6)
+        .lean(),
     ]);
 
-    const recentFiles = await File.find({ owner: userId, isTrashed: false })
-      .sort('-createdAt')
-      .limit(6);
+    // Build stats từ aggregate result
+    const byType = { image: { size: 0, count: 0 }, video: { size: 0, count: 0 }, document: { size: 0, count: 0 } };
+    let totalFiles = 0;
+
+    for (const group of aggregateResult) {
+      totalFiles += group.count;
+      if (group._id === 'image') byType.image = { size: group.size, count: group.count };
+      else if (group._id === 'video') byType.video = { size: group.size, count: group.count };
+      else if (group._id === 'raw') byType.document = { size: group.size, count: group.count };
+    }
 
     res.status(200).json({
       success: true,
       data: {
-        totalFiles: totalCount,
+        totalFiles,
         storageUsed: req.user.storageUsed,
         storageLimit: req.user.storageLimit,
-        byType: {
-          image: imageStat[0] || { size: 0, count: 0 },
-          video: videoStat[0] || { size: 0, count: 0 },
-          document: docStat[0] || { size: 0, count: 0 },
-        },
+        byType,
         recentFiles,
       },
     });

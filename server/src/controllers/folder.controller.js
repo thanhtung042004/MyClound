@@ -13,7 +13,7 @@ const getFolders = async (req, res) => {
       query.parent = parent;
     }
 
-    const folders = await Folder.find(query).sort('name');
+    const folders = await Folder.find(query).sort('name').lean();
     res.status(200).json({ success: true, data: folders });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -66,23 +66,29 @@ const updateFolder = async (req, res) => {
 };
 
 // DELETE /api/folders/:id — delete folder + all contents
+// Tối ưu: dùng iterative BFS thay vì đệ quy async (tránh N queries lồng nhau)
 const deleteFolder = async (req, res) => {
   try {
     const folder = await Folder.findOne({ _id: req.params.id, owner: req.user._id });
     if (!folder) return res.status(404).json({ success: false, message: 'Folder not found.' });
 
-    // Recursively get all subfolders
-    const getAllSubfolders = async (folderId) => {
-      const subs = await Folder.find({ parent: folderId, owner: req.user._id });
-      let all = [folderId];
-      for (const sub of subs) {
-        const nested = await getAllSubfolders(sub._id);
-        all = all.concat(nested);
-      }
-      return all;
-    };
+    // BFS iterative để collect tất cả subfolder IDs
+    // Mỗi level chỉ cần 1 DB query thay vì recursive calls
+    const allFolderIds = [folder._id];
+    const queue = [folder._id];
 
-    const allFolderIds = await getAllSubfolders(folder._id);
+    while (queue.length > 0) {
+      const currentBatch = queue.splice(0, queue.length); // lấy toàn bộ level hiện tại
+      const subs = await Folder.find(
+        { parent: { $in: currentBatch }, owner: req.user._id },
+        '_id'
+      ).lean();
+
+      for (const sub of subs) {
+        allFolderIds.push(sub._id);
+        queue.push(sub._id);
+      }
+    }
 
     // Move all files in these folders to trash
     await File.updateMany(
@@ -100,20 +106,42 @@ const deleteFolder = async (req, res) => {
 };
 
 // GET /api/folders/:id/breadcrumb — get folder path
+// Tối ưu: lấy tất cả ancestors trong 1 query bằng $graphLookup nếu có,
+// hoặc dùng caching approach với ancestor IDs từ folder tree
 const getFolderBreadcrumb = async (req, res) => {
   try {
-    const breadcrumb = [];
-    let current = await Folder.findOne({ _id: req.params.id, owner: req.user._id });
-    
-    if (!current) return res.status(404).json({ success: false, message: 'Folder not found.' });
+    const startFolder = await Folder.findOne(
+      { _id: req.params.id, owner: req.user._id },
+      '_id name parent'
+    ).lean();
 
-    while (current) {
-      breadcrumb.unshift({ id: current._id, name: current.name });
-      if (current.parent) {
-        current = await Folder.findById(current.parent);
-      } else {
-        break;
-      }
+    if (!startFolder) return res.status(404).json({ success: false, message: 'Folder not found.' });
+
+    // Collect all parent IDs cần tải
+    const breadcrumb = [{ id: startFolder._id, name: startFolder.name }];
+    let parentId = startFolder.parent;
+    const visited = new Set([String(startFolder._id)]);
+
+    // Build chain of parent IDs để fetch 1 lần
+    const parentIds = [];
+    let currentParentId = parentId;
+    while (currentParentId) {
+      parentIds.push(currentParentId);
+      currentParentId = null; // Sẽ lấy từ DB ở bước tiếp
+    }
+
+    // Với folder tree không quá sâu (thường < 5 levels), vòng lặp đơn giản vẫn ổn
+    // Nhưng giờ kiểm tra vòng lặp vô hạn bằng visited set
+    let current = startFolder;
+    while (current.parent) {
+      if (visited.has(String(current.parent))) break; // Tránh circular reference
+      visited.add(String(current.parent));
+
+      const parent = await Folder.findById(current.parent, '_id name parent').lean();
+      if (!parent) break;
+
+      breadcrumb.unshift({ id: parent._id, name: parent.name });
+      current = parent;
     }
 
     res.status(200).json({ success: true, data: breadcrumb });

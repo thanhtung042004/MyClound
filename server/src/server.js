@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 
 // Route imports
@@ -58,14 +59,23 @@ app.use(cors(corsOptions));
 // Xử lý preflight OPTIONS cho tất cả routes
 app.options('*', cors(corsOptions));
 
+// Rate limiting — chặn brute force login/register
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 phút
+  max: 30,                   // Tối đa 30 requests/15 phút/IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Quá nhiều yêu cầu. Vui lòng thử lại sau 15 phút.' },
+});
+
 // Middleware
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Giảm từ 50mb xuống 10mb — upload file dùng multipart, không cần JSON lớn
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Chỉ log request khi có lỗi (status >= 400), bỏ qua các request thành công
 app.use(morgan('dev', {
   skip: (req, res) => res.statusCode < 400,
 }));
-
 
 // Routes
 app.get('/', (req, res) => {
@@ -75,7 +85,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/folders', folderRoutes);
 app.use('/api/download', downloadRoutes);

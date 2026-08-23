@@ -17,7 +17,11 @@ const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
+    // Dùng lean() để trả về plain JS object — nhanh hơn Mongoose document đầy đủ
+    // Select chỉ các field cần thiết, bỏ password và securityAnswer
+    const user = await User.findById(decoded.id)
+      .select('-password -securityAnswer')
+      .lean();
 
     if (!user) {
       return res.status(401).json({ 
@@ -47,3 +51,4 @@ const adminOnly = (req, res, next) => {
 };
 
 module.exports = { protect, adminOnly };
+

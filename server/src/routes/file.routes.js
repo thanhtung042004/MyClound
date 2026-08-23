@@ -5,7 +5,7 @@ const {
   shareFile, revokeShare, getSharedFile, restoreFile, getStats
 } = require('../controllers/file.controller');
 const { protect } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { upload, processUpload } = require('../middleware/upload');
 
 // Public shared file route (no auth needed)
 router.get('/shared/:token', getSharedFile);
@@ -15,7 +15,7 @@ router.use(protect);
 
 router.get('/stats', getStats);
 router.get('/', getFiles);
-router.post('/upload', upload.array('files', 20), uploadFiles);
+router.post('/upload', upload.array('files', 20), processUpload, uploadFiles);
 router.put('/:id', updateFile);
 router.delete('/:id', deleteFile);
 router.post('/:id/share', shareFile);

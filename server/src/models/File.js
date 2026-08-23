@@ -100,8 +100,13 @@ const fileSchema = new mongoose.Schema({
 
 // Text index for search
 fileSchema.index({ name: 'text', originalName: 'text', tags: 'text' });
+// Compound index cho query cơ bản: list files theo owner + folder
 fileSchema.index({ owner: 1, folder: 1 });
-// Use partialFilterExpression to ignore nulls completely
+// Compound index cho browse/trash — tối ưu getFiles() và Trash page
+fileSchema.index({ owner: 1, isTrashed: 1, createdAt: -1 });
+// Compound index cho getStats() aggregate — tránh full scan
+fileSchema.index({ owner: 1, resourceType: 1, isTrashed: 1 });
+// Partial unique index cho shareToken (bỏ null)
 fileSchema.index(
   { shareToken: 1 }, 
   { unique: true, partialFilterExpression: { shareToken: { $type: 'string' } } }
