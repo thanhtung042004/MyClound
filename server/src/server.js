@@ -26,6 +26,7 @@ const allowedOrigins = [
   'https://my-cloud.vercel.app',
   'https://my-clound.vercel.app',
   'https://my-clound-git-main-thanhtung042004s-projects.vercel.app',
+  'https://myclound.onrender.com',
   process.env.CLIENT_URL,
 ].filter(Boolean).map(o => o.replace(/\/$/, '')); // Lọc undefined và bỏ dấu / cuối
 

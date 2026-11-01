@@ -24,8 +24,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('myclound_token');
-      window.location.href = '/login';
+      const isAuthPage = ['/login', '/register'].some((p) =>
+        window.location.pathname.startsWith(p)
+      );
+      // Chỉ redirect nếu KHÔNG đang ở trang auth (tránh vòng lặp)
+      if (!isAuthPage) {
+        localStorage.removeItem('myclound_token');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
